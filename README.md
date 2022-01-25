@@ -1,4 +1,4 @@
-# irisa Parser
+# Irisa Parser
 
 ## Set up
 
