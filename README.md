@@ -1,5 +1,5 @@
 # Irisa Parser
 
-## Set up
+## Setup
 
 ## Usage
