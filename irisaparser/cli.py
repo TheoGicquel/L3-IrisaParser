@@ -21,7 +21,7 @@ def getFilesFromDirectories(directories):
         else:
             print("directory: "+directory+" not found, ignored")
 
-    if(len(files) == 0): print("directory: "+directory+" no valid file found")
+        if(len(files) == 0): print("directory: "+directory+" no valid file found")
 
     return files
 
@@ -69,6 +69,9 @@ def checkArg(args):
 
             elif(optionIndex == 2): #output directory
 
+                if(ret.get("output") != None):
+                    ret["error"] = "invalid duplicated option "+currentArg+", multiple output directories not allowed"
+                    break
                 if(index+1 >= len(args)):
                     ret["error"] = "argument missing after "+currentArg
                     break
@@ -94,7 +97,7 @@ def checkArg(args):
 
         index += 1
 
-    if(ret.get("error") == None):
+    if(ret.get("error") == None and ret.get("help") == None):
 
         for file in files:
 
@@ -105,7 +108,8 @@ def checkArg(args):
                 print("file: "+file+" not a file, ignored")
                 files.remove(file)
 
-        files = files + getFilesFromDirectories(directories)
+        if(len(directories) > 0):
+            files = files + getFilesFromDirectories(directories)
 
         if(len(files) < 1): 
             ret["error"] = "no valid file provided"
