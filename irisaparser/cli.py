@@ -2,10 +2,10 @@ import sys
 import os
 
 # TODO thinking about refactoring using dictionary instead of Array
-# to nest function to str and avoid if/elif in checkArg
+# to nest function to str and avoid if/elif in check_args
 
 # return an array of file in a directory
-def getFilesFromDirectories(directories):
+def get_files_from_directories(directories):
     files = []
 
     for directory in directories:
@@ -26,7 +26,7 @@ def getFilesFromDirectories(directories):
     return files
 
 # check args
-def checkArg(args):
+def check_args(args):
 
     ret = {}
     index = 0
@@ -34,19 +34,19 @@ def checkArg(args):
     directories = []
     files = []
     while(index < len(args)):
-        currentArg = args[index]
+        current_arg = args[index]
 
         # check if current arg is an option
-        if(small_option.count(currentArg) > 0 or long_option.count(currentArg) > 0):
+        if(small_option.count(current_arg) > 0 or long_option.count(current_arg) > 0):
             try:
-                optionIndex = small_option.index(currentArg)
+                option_index = small_option.index(current_arg)
             except ValueError:
                 try:
-                    optionIndex = long_option.index(currentArg)
+                    option_index = long_option.index(current_arg)
                 except ValueError:
                     pass
 
-            if(optionIndex == 0): #help
+            if(option_index == 0): #help
                 ret["help"] = True
                 print("usage : irisaParser.py [-h| --help] | [-d|--directory <directory> ] [-o|--ouput_directory <outputDirectory>] <file> [files]... \n")
                 print("Options : \n")
@@ -55,28 +55,28 @@ def checkArg(args):
                 print("-o, --ouput_directory <output directory> : specify a directory where place ouput files \n")
                 break
 
-            elif(optionIndex == 1): #directory
+            elif(option_index == 1): #directory
 
                 if(index+1 >= len(args)):
-                    ret["error"] = "argument missing after "+currentArg
+                    ret["error"] = "argument missing after "+current_arg
                     break
                 elif(small_option.count(args[index+1]) > 0 or long_option.count(args[index+1]) > 0):
-                    ret["error"] = "invalid option "+args[index+1]+" after "+currentArg+", argument expected"
+                    ret["error"] = "invalid option "+args[index+1]+" after "+current_arg+", argument expected"
                     break
                 else:
                     index += 1
                     directories.append(args[index])
 
-            elif(optionIndex == 2): #output directory
+            elif(option_index == 2): #output directory
 
                 if(ret.get("output") != None):
-                    ret["error"] = "invalid duplicated option "+currentArg+", multiple output directories not allowed"
+                    ret["error"] = "invalid duplicated option "+current_arg+", multiple output directories not allowed"
                     break
                 if(index+1 >= len(args)):
-                    ret["error"] = "argument missing after "+currentArg
+                    ret["error"] = "argument missing after "+current_arg
                     break
                 elif(small_option.count(args[index+1]) > 0 or long_option.count(args[index+1]) > 0):
-                    ret["error"] = "invalid option "+args[index+1]+" after "+currentArg+", argument expected"
+                    ret["error"] = "invalid option "+args[index+1]+" after "+current_arg+", argument expected"
                     break
                 else:
                     index += 1
@@ -93,7 +93,7 @@ def checkArg(args):
 
         # if not an option then it must be a file
         else:
-            files.append(currentArg)
+            files.append(current_arg)
 
         index += 1
 
@@ -109,7 +109,7 @@ def checkArg(args):
                 files.remove(file)
 
         if(len(directories) > 0):
-            files = files + getFilesFromDirectories(directories)
+            files = files + get_files_from_directories(directories)
 
         if(len(files) < 1): 
             ret["error"] = "no valid file provided"
@@ -127,15 +127,15 @@ args = sys.argv
 args.remove(args[0])
 
 # check args
-checkResult = checkArg(args)
+check_result = check_args(args)
 
-if(checkResult.get("error") != None):
-    print("error: "+checkResult.get("error")+"\n")
+if(check_result.get("error") != None):
+    print("error: "+check_result.get("error")+"\n")
     print("use -h or --help for usage"+"\n")
 
-elif(checkResult.get("help") == None):
-    if(checkResult.get("output") != None):
+elif(check_result.get("help") == None):
+    if(check_result.get("output") != None):
         print("output: ")
-        print(checkResult.get("output"))
+        print(check_result.get("output"))
     print("files: ")
-    print(checkResult.get("files"))
+    print(check_result.get("files"))
