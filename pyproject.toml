@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "irisaparser"
+version = "0.1.0"
+description = "A scientif paper parser"
+authors = ["15772402"]
+license = "None"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
