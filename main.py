@@ -1,0 +1,4 @@
+import irisaparser
+
+irisaparser.hello()
+
