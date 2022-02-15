@@ -61,10 +61,19 @@ def extract_from_font_size(pdf: pdfplumber.PDF):
 def get_largest_font_size(plumbed: pdfplumber.PDF):
     title_page_chars = plumbed.pages[0].chars # only first page used
     largest_font = 0.0
+    cur = 0.0
     for i in title_page_chars:
         if(i['size'] > largest_font):
             largest_font = i['size']
-    return largest_font    
+            cur = largest_font
+    return largest_font   
+"""
+!TODO: Fix false positives for pdf with larger capital letter than first title
+Hypothesis:
+    * if font size decreases, then title has been passed
+    * extract first 2-3 lines as raw text and compare with best matches of large font size strings
+    
+""" 
 ###############################################################################
     
 def debug(directory):
@@ -102,7 +111,7 @@ def debug(directory):
             else:
                 print(Fore.MAGENTA + 'line : ' + title_line[0:lenght] + '..' + Fore.RESET,end=tab)
             # first line matching meta
-            if(title_line!=title_meta):
+            if(title_line[0:5]!=title_meta[0:5]):
                 meta_no_match = meta_no_match + 1
             
             # font size
@@ -112,11 +121,11 @@ def debug(directory):
 
     print("== summary == ")
     print("total pdf files \t\t: " + Fore.YELLOW + str(count) + Fore.RESET)
-    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count))
-    print("w/o matching metadata & title \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count))
+    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_missing/count*100,1)) + "%)")
+    print("w/o title as first line \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_no_match/count*100,1)) + "%)")
     print("== end summary == ")
     print("")
 
 
 if __name__ == '__main__':
-    debug('./tests/corpus/')
+    debug('./tests/corpus_large/')
