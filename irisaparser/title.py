@@ -30,9 +30,7 @@ def extract_first_line(plumbed: pdfplumber.PDF):
     filtered = title_page_chars.extract_text(x_tolerance=3, y_tolerance=3, layout=False, x_density=7.25, y_density=13)
     return(filtered.split('\n')[0])
     
-    
-def debug():
-    directory = './tests/corpus/'
+def debug(directory):
     errcount = 0
     count = 0
     difcount =0
@@ -62,4 +60,5 @@ def debug():
     print("")
 
 
-debug()
+if __name__ == '__main__':
+    debug('./tests/corpus/')
