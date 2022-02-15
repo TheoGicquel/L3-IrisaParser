@@ -28,7 +28,7 @@ def extract_from_metadata(plumbed: pdfplumber.PDF):
     if(output_lower is not None):
         return output_lower
     if(output_lower == None and output_lower == None):
-        return '!NOT_FOUND!'
+        return 'NULL'
         
         
 ###############################################################################
@@ -68,10 +68,16 @@ def get_largest_font_size(plumbed: pdfplumber.PDF):
 ###############################################################################
     
 def debug(directory):
-    errcount = 0
-    count = 0
-    difcount =0
-    lenght = 12
+    """ Attempt title extraction of titles of all pdf files in specified directory
+
+    Args:
+        directory (string): path to directory containing pdf files
+    """
+    meta_missing = 0 # count of files without metadata
+    count = 0 # count of pdf files processed
+    meta_no_match = 0 # amount of titles not matching with metadata
+    lenght = 25 # max lenght of title to display
+    tab = '\t' # tab for formatting
     print('')
     print("[RUNNING irisaparser.title.debug()]")
     for filename in os.listdir(directory):
@@ -80,22 +86,34 @@ def debug(directory):
         if os.path.isfile(f):
             count = count + 1
             title_meta,title_line,title_font_extracted = extract(f)
-            if(title_meta == '!NOT_FOUND!' or title_meta==''):
-                count = count
-                print('['+ str(count) + ']\t' + Fore.BLUE + 'meta : ' + Fore.RED + 'N/A' + Fore.BLUE + '\t' + 'line : '+ Fore.GREEN + title_line[0:lenght]+'...' + Fore.BLUE + '\t\t\t' + 'font : ' + Fore.GREEN + str(title_font_extracted) + Fore.RESET)
-                errcount = errcount + 1
-            else:    
-                count = count
-                print('['+ str(count) + ']\t' + Fore.BLUE + 'meta : ' + Fore.GREEN + title_meta[0:lenght] + '...' + Fore.BLUE + '\t' + 'line : ' + Fore.GREEN + title_line[0:lenght] + '...' + Fore.BLUE + '\t\t\t' + 'font : ' + Fore.GREEN + str(title_font_extracted) + Fore.RESET)
             
+            print('['+ str(count) + ']',end=tab)
+            
+            # metadata
+            if(title_meta == 'NULL' or title_meta==''):
+                print(Fore.RED + 'meta : N/A' + Fore.RESET,end=tab)
+                meta_missing = meta_missing + 1
+            else:
+                print(Fore.GREEN + 'meta : ' + title_meta[0:lenght] + '..' + Fore.RESET,end=tab)
+            
+            # first line
+            if(title_line == 'NULL' or title_line==''):
+                print(Fore.RED + 'line : N/A' + Fore.RESET,end=tab)
+            else:
+                print(Fore.MAGENTA + 'line : ' + title_line[0:lenght] + '..' + Fore.RESET,end=tab)
+            # first line matching meta
             if(title_line!=title_meta):
-                difcount = difcount + 1
+                meta_no_match = meta_no_match + 1
+            
+            # font size
+            print(Fore.CYAN + 'font : ' + title_font_extracted[0:lenght] + '..' + Fore.RESET)
+            
 
 
     print("== summary == ")
     print("total pdf files \t\t: " + Fore.YELLOW + str(count) + Fore.RESET)
-    print("w/o title metadata \t\t: " + Fore.RED + str(errcount) + Fore.RESET + "/" + str(count))
-    print("w/o matching metadata & title \t: " + Fore.RED +  str(difcount) + Fore.RESET + "/" + str(count))
+    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count))
+    print("w/o matching metadata & title \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count))
     print("== end summary == ")
     print("")
 
