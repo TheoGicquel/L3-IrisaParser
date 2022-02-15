@@ -10,6 +10,7 @@ init() #initialize colorama
 
 def extract(input_path):
     """
+    Attempt to extract title from pdf file using pdfplumber and various methods
     """
     with pdfplumber.open(input_path) as pdf:
         meta_title = extract_from_metadata(pdf)
@@ -18,14 +19,19 @@ def extract(input_path):
 
 def extract_from_metadata(plumbed: pdfplumber.PDF):
     """Returns 'Title' attribute from pdf metadata"""
-    output = plumbed.metadata.get('Title')
-    if(output == None):
-        output = '!NOT_FOUND!'
+    output_upper = plumbed.metadata.get('Title')
+    output_lower = plumbed.metadata.get('title')
+    if(output_upper is not None):
+        return output_upper
+    if(output_lower is not None):
+        return output_lower
+    if(output_lower == None and output_lower == None):
+        return '!NOT_FOUND!'
         
-    return output
+        
 
 def extract_first_line(plumbed: pdfplumber.PDF):
-    """ Dummy function"""
+    """ Fetch first line of pdf file using builtin pdfplumber extract_text() method"""
     title_page_chars = plumbed.pages[0] # only first page used
     filtered = title_page_chars.extract_text(x_tolerance=3, y_tolerance=3, layout=False, x_density=7.25, y_density=13)
     return(filtered.split('\n')[0])
