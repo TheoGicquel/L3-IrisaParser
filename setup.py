@@ -10,5 +10,5 @@ setup(
     author_email='author@gmail.com',
     description='Scientific paper parser',
     packages=find_packages(),
-    install_requires=[pdfplumber],  # e.g. ['numpy >= 1.11.1', 'matplotlib >= 1.5.1']
+    install_requires=['pdfplumber'],  # e.g. ['numpy >= 1.11.1', 'matplotlib >= 1.5.1']
 )
