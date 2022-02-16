@@ -1,10 +1,12 @@
 from argparse import ArgumentError
 import logging
+from time import time
 import pdfplumber
 import json
 import os
 import colorama
 from colorama import init,Fore,Back,Style
+import time
 init() #initialize colorama 
 
 ###############################################################################
@@ -13,8 +15,10 @@ def extract(input_path):
     Attempt to extract title from pdf file using pdfplumber and various methods
     """
     with pdfplumber.open(input_path) as pdf:
-        print('[*] "' + input_path + '"')
-        title = get_title_from_font(pdf)
+        print('\n\n[*] "' + input_path + '"')
+        titles = get_title_from_font(pdf)
+        for title in titles:
+            print(Fore.BLUE + 'Potential title found : ' + Fore.RESET + '"' + title + '"')
     return title
 
 ###############################################################################
@@ -27,9 +31,9 @@ def get_title_from_font(pdf: pdfplumber.PDF,max_pages=1,max_fonts=3):
     if(max_fonts < 1):
         raise ArgumentError('must be at least 1 font')
     
-    get_largest_font_sizes_dict(pdf,max_pages=max_pages,max_fonts=max_fonts)
+    res = get_largest_font_sizes_dict(pdf,max_pages=max_pages,max_fonts=max_fonts)
 
-
+    return res
 
 
 def get_largest_font_pages(pdf: pdfplumber.PDF,max_pages):
@@ -45,33 +49,58 @@ def get_largest_font_pages(pdf: pdfplumber.PDF,max_pages):
 
 
 
-def get_largest_lines(pdf: pdfplumber.PDF,max_fonts,max_pages,largest_font):
+def get_largest_font_list(pdf: pdfplumber.PDF,max_fonts,max_pages,largest_font):
     """ Return array with x largest lines in pdf file """
     res = {}
-    print('\t[get_largest_lines]')
+    font_list_uniq = []
+    current_font =0
     for page in pdf.pages[:max_pages]:
-        print( '\t\t' + '"' + Fore.GREEN  ,end='')
+        #print( '\t\t' + '"' + Fore.GREEN  ,end='')
         for char in page.chars:
-            if(char.get('size')==largest_font):
-                print('' + char.get('text'),end='')
-            
-    print(Fore.RESET+ '"')
+            if(char.get('size')!=current_font):
+                current_font = char.get('size')
+                font_list_uniq.append(char.get('size'))
+    
+    font_list_uniq.sort(reverse=True)
+    font_list_uniq = remove_duplicate_entries(font_list_uniq)                        
+    font_list_uniq = font_list_uniq[:max_fonts]
+    
+    return font_list_uniq
+
+
+
+def remove_duplicate_entries(font_list):
+    res = font_list
+    res = list(dict.fromkeys(res))
     return res
-
-
-
-
 
 def get_largest_font_sizes_dict(pdf: pdfplumber.PDF,max_fonts,max_pages):
-    """ Fetch largest font in first 'max_pages' pages of pdf file """
-    res = {}
-    largest = get_largest_font_pages(pdf=pdf,max_pages=max_pages)
-    print('\tlargest font in pg[' + '1-' + str(max_pages) + '] :'  + str(round(largest,2)) + 'pt')
-    res = get_largest_lines(pdf=pdf,max_fonts=max_fonts,max_pages=max_pages,largest_font=largest)
+    """ Fetch largest fonts in first 'max_pages' pages of pdf file """
+    largest_font = get_largest_font_pages(pdf=pdf,max_pages=max_pages)
+    #print('\tlargest font in pg[' + '1-' + str(max_pages) + '] :'  + str(round(largest,2)) + 'pt')
+    largest_fonts = get_largest_font_list(pdf=pdf,max_fonts=max_fonts,max_pages=max_pages,largest_font=largest_font)
+    sentences = get_sentences(pdf=pdf,max_sentences=max_fonts,font_list=largest_fonts)
     
-    return res
+    return sentences
+    
 
+def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
+    """ return array with x largest sentences in pdf file """
+    res = []
+    page = pdf.pages[0]
+    num_sentences = len(font_list)
+    i = 0
+    potent_title = ''
+    while i < num_sentences:
+        for char in page.chars:
+            #print('i:' + str(i) + ' char: ' + char.get('text'))         
+            if(char.get('size') == font_list[i]):
+                potent_title += char.get('text')
+        res.append(potent_title)
+        potent_title=''
+        i = i + 1
 
+    return res  
 
 
 
@@ -145,4 +174,7 @@ def debug(directory):
 
 
 if __name__ == '__main__':
+    time_start = time.time()
     debug('./tests/corpus/')
+    time_end = time.time()
+    print('TIME : ' + str(round(time_end-time_start,2)) + 's')
