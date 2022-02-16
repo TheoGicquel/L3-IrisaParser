@@ -18,7 +18,8 @@ def extract(input_path):
         print('\n\n[*] "' + input_path + '"')
         titles = get_title_from_font(pdf)
         for title in titles:
-            print(Fore.BLUE + 'Potential title found : ' + Fore.RESET + '"' + title + '"')
+            if(len(title)<90 and len(title)>20):
+                print(Fore.BLUE + 'Potential title found : ' + Fore.RESET + '"' + title + '"' + '(' + str(len(title)) + ')')
     return title
 
 ###############################################################################
