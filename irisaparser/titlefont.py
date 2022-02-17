@@ -1,6 +1,8 @@
 from argparse import ArgumentError
 import logging
+from operator import truediv
 from time import time
+from traceback import print_tb
 import pdfplumber
 import json
 import os
@@ -17,12 +19,41 @@ def extract(input_path):
     with pdfplumber.open(input_path) as pdf:
         print('\n\n[*] "' + input_path + '"')
         titles = get_title_from_font(pdf)
+        accurate = []
         for title in titles:
             if(len(title)<90 and len(title)>20):
                 print(Fore.BLUE + 'Potential title found : ' + Fore.RESET + '"' + title + '"' + '(' + str(len(title)) + ')')
+                accurate.append(title)
+        text = pdf.pages[0].extract_text()
+
+        lines = text.split('\n')
+        lines = filter_lines(lines)
+        #print(Fore.BLUE + 'Extracted text : ' + Fore.RESET + '"' + lines[0] + '"' + '(' + str(len(text)) + ')')
+        title = line_potential_line_matcher(lines,accurate)
     return title
 
 ###############################################################################
+
+def filter_lines(lines):
+    line_list = lines[0:10]
+    res = []
+
+    for line in line_list:
+        if(len(line)<80):
+            res.append(line)
+    return res
+    
+def line_potential_line_matcher(lines,potential_title):
+    sentence = ''
+    res = []
+    for p_title in potential_title:
+        for line in lines:
+            scan = line.strip()
+            if(p_title.find(scan)):
+                sentence = sentence + line + ' '
+        res.append(sentence)
+        sentence = ''
+    print(res)
 
 def get_title_from_font(pdf: pdfplumber.PDF,max_pages=1,max_fonts=3):
     if((max_pages > len(pdf.pages))):
@@ -84,11 +115,22 @@ def get_largest_font_sizes_dict(pdf: pdfplumber.PDF,max_fonts,max_pages):
     
     return sentences
     
+def crop_first_page(page):
+    
+
 
 def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
     """ return array with x largest sentences in pdf file """
     res = []
     page = pdf.pages[0]
+    #(x0, top, x1, bottom)
+    x0 = 0
+    top = 0
+    x1 = page.width
+    bottom = float(page.height)/3
+    top_page = page.crop((x0, top, x1, bottom))
+    #im = top_page.to_image(resolution=150)
+    #im.save("bottom.png", format="PNG")
     num_sentences = len(font_list)
     i = 0
     potent_title = ''
@@ -176,6 +218,6 @@ def debug(directory):
 
 if __name__ == '__main__':
     time_start = time.time()
-    debug('./tests/corpus/')
+    debug('./tests/single/')
     time_end = time.time()
     print('TIME : ' + str(round(time_end-time_start,2)) + 's')
