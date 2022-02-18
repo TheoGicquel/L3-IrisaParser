@@ -1,14 +1,13 @@
 import json
 import pdfplumber
 
-from pathlib import Path
-corpus_dir = Path.cwd() / 'tests' / 'corpus'
-custom_corpus_dir = Path.cwd() / 'tests' / 'custom'
-
-
-
-def extract(input_path):
+def get(input_path):
     """Returns metadata of given pdf as Dictionary"""
     with pdfplumber.open(input_path) as pdf:
         return pdf.metadata
 
+def get_title(input_path):
+    """Returns Title metadata of given pdf"""
+    with pdfplumber.open(input_path) as pdf:
+        return pdf.metadata.get('Title')
+    
