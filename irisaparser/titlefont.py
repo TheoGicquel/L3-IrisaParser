@@ -20,19 +20,30 @@ def extract(input_path):
         print('\n\n[*] "' + input_path + '"')
         titles = get_title_from_font(pdf)
         accurate = []
+        first_page = pdf.pages[0]
         for title in titles:
             if(len(title)<90 and len(title)>20):
                 print(Fore.BLUE + 'Potential title found : ' + Fore.RESET + '"' + title + '"' + '(' + str(len(title)) + ')')
                 accurate.append(title)
-        text = pdf.pages[0].extract_text()
-
+        x0 = 0
+        top = 0
+        x1 = first_page.width
+        bottom = float(first_page.height)/3
+        cropped_page = first_page.crop((x0, top, x1, bottom))
+        text = cropped_page.extract_text()
+        print(Fore.GREEN + 'Extracted cropped text : ' + Fore.RESET)
         lines = text.split('\n')
         lines = filter_lines(lines)
+        print(lines)
+        print('')
         #print(Fore.BLUE + 'Extracted text : ' + Fore.RESET + '"' + lines[0] + '"' + '(' + str(len(text)) + ')')
         title = line_potential_line_matcher(lines,accurate)
+        
     return title
 
 ###############################################################################
+
+
 
 def filter_lines(lines):
     line_list = lines[0:10]
@@ -53,6 +64,7 @@ def line_potential_line_matcher(lines,potential_title):
                 sentence = sentence + line + ' '
         res.append(sentence)
         sentence = ''
+    print(Fore.CYAN + 'matches : ' + Fore.RESET,end='')
     print(res)
 
 def get_title_from_font(pdf: pdfplumber.PDF,max_pages=1,max_fonts=3):
@@ -115,22 +127,24 @@ def get_largest_font_sizes_dict(pdf: pdfplumber.PDF,max_fonts,max_pages):
     
     return sentences
     
-def crop_first_page(page):
-    
+def crop_first_page_pdf(pdf:pdfplumber.PDF):
+    page = pdf.pages[0]
+        #(x0, top, x1, bottom)
+    x0 = 0
+    top = 0
+    x1 = page.width
+    bottom = float(page.height)/3
+    page = page.crop((x0, top, x1, bottom))
+    #im = top_page.to_image(resolution=150)
+    #im.save("bottom.png", format="PNG")
+    return page
 
 
 def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
     """ return array with x largest sentences in pdf file """
     res = []
     page = pdf.pages[0]
-    #(x0, top, x1, bottom)
-    x0 = 0
-    top = 0
-    x1 = page.width
-    bottom = float(page.height)/3
-    top_page = page.crop((x0, top, x1, bottom))
-    #im = top_page.to_image(resolution=150)
-    #im.save("bottom.png", format="PNG")
+
     num_sentences = len(font_list)
     i = 0
     potent_title = ''
@@ -200,18 +214,7 @@ def debug(directory):
         if os.path.isfile(f):
             count = count + 1
             title = extract(f)
-    '''
-            print('['+ str(count) + ']',end=tab)
-            #print(Fore.CYAN + 'font : ' + title[0:lenght] + '..' + Fore.RESET)
 
-
-    print("== summary == ")
-    print("total pdf files \t\t: " + Fore.YELLOW + str(count) + Fore.RESET)
-    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_missing/count*100,1)) + "%)")
-    print("w/o title as first line \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_no_match/count*100,1)) + "%)")
-    print("== end summary == ")
-    print("")
-    '''
 
 
 

@@ -4,7 +4,8 @@ import os
 import colorama
 from colorama import init,Fore,Back,Style
 init() #initialize colorama 
-
+import io # needed for unicode support
+encoding='utf-8'
 ###############################################################################
 def extract(input_path):
     """
@@ -54,7 +55,7 @@ def extract_from_font_size(pdf: pdfplumber.PDF):
             output += str(i['text'])
 
     filtered = title_page.filter(lambda x: x.get("size", 0) > 13)
-    #print(filtered.extract_text())
+    print(filtered.extract_text())
 
 
 
@@ -83,7 +84,7 @@ Hypothesis:
 """ 
 ###############################################################################
     
-def debug(directory):
+def extract_dir(in_directory,out_directory):
     """ Attempt title extraction of titles of all pdf files in specified directory
 
     Args:
@@ -94,53 +95,35 @@ def debug(directory):
     meta_no_match = 0 # amount of titles not matching with metadata
     lenght = 50 # max lenght of title to display
     tab = '\t' # tab for formatting
-    disp_meta = True
-    disp_line = True
+    disp_meta = False
+    disp_line = False
     print('')
-    print("[RUNNING irisaparser.title.debug()]")
-    for filename in os.listdir(directory):
-        f = os.path.join(directory, filename)
+    print("[RUNNING irisaparser.text.extractor]")
+    input_paths = os.listdir(in_directory)
+    output_paths = os.listdir(out_directory)
+    for filename in input_paths:
+        filein = os.path.join(in_directory, filename)
 
-        if os.path.isfile(f):
-            count = count + 1
-            title_meta,title_line,title_font_extracted = extract(f)
-            print('['+ str(count) + ']',end=tab)
+        if os.path.isfile(filein):
+            with pdfplumber.open(filein) as pdf:
+                title_page=pdf.pages[0]
+                #print(title_page.objects)
+                # x_tolerance : 
+                title_page_text=title_page.extract_text(x_tolerance=1,y_tolerance=3).split('\n')
+                print(Fore.YELLOW + '[FILE '+ filename + ']' + Fore.RESET)
+                itera = 0
+                for line in title_page_text[0:3]:
+                    itera=itera+1
+                    print(Fore.BLUE + 'Line ' + str(itera) + ':'+ Fore.RESET + line)
+                #print(type(title_page_text))
+
+                
             
-            # metadata
-            if(title_meta == 'NULL' or title_meta==''):
-                if(disp_meta):
-                    print(Fore.RED + 'meta : N/A' + Fore.RESET,end=tab)
-                meta_missing = meta_missing + 1
-            else:
-                if(disp_meta):
-                    print(Fore.GREEN + 'meta : ' + title_meta + Fore.RESET,end=tab)
-            
-            # first line
-            if(disp_line):
-                if(title_line == 'NULL' or title_line==''):
 
-                    print(Fore.RED + 'line : N/A' + Fore.RESET,end=tab)
-                else:
-                    print(Fore.MAGENTA + 'line : ' + title_line[0:lenght] + '..' + Fore.RESET,end=tab)
-            # first line matching meta
-            if(title_line[0:5]!=title_meta[0:5]):
-                meta_no_match = meta_no_match + 1
-            
-            # font size
-            #print(Fore.CYAN + 'font : ' + title_font_extracted[0:lenght] + '..' + Fore.RESET)
-            print('')
-
-
-    print("== summary == ")
-    print("total pdf files \t\t: " + Fore.YELLOW + str(count) + Fore.RESET)
-    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_missing/count*100,1)) + "%)")
-    print("w/o title as first line \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_no_match/count*100,1)) + "%)")
-    print("== end summary == ")
-    print("")
 
 
 
 
 
 if __name__ == '__main__':
-    debug('./tests/corpus_istex/')
+    extract_dir('./tests/corpus/','./tests/single_extracted/')
