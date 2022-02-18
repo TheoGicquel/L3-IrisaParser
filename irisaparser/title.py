@@ -1,146 +1,199 @@
+from argparse import ArgumentError
+import logging
+
+from time import time
+
 import pdfplumber
-import json
 import os
 import colorama
 from colorama import init,Fore,Back,Style
+import time
+
 init() #initialize colorama 
-
-###############################################################################
-def extract(input_path):
-    """
-    Attempt to extract title from pdf file using pdfplumber and various methods
-    """
-    with pdfplumber.open(input_path) as pdf:
-        meta_title = extract_from_metadata(pdf)
-        first_line = extract_first_line(pdf)
-        font_size = extract_from_font_size(pdf)
-    return meta_title,first_line,font_size
-
-###############################################################################
-def extract_from_metadata(plumbed: pdfplumber.PDF):
-    """Returns 'Title' attribute from pdf metadata"""
-    output_upper = plumbed.metadata.get('Title')
-    output_lower = plumbed.metadata.get('title')
-    if(output_upper is not None):
-        return output_upper
-    if(output_lower is not None):
-        return output_lower
-    if(output_lower == None and output_lower == None):
-        return 'NULL'
-        
-        
-###############################################################################
-
-def extract_first_line(plumbed: pdfplumber.PDF):
-    """ Fetch first line of pdf file using builtin pdfplumber extract_text() method"""
-    title_page_chars = plumbed.pages[0] # only first page used
-    filtered = title_page_chars.extract_text(x_tolerance=3, y_tolerance=3, layout=False, x_density=7.25, y_density=13)
-    return(filtered.split('\n')[0])
-
-###############################################################################
-def extract_from_font_size(pdf: pdfplumber.PDF):
-    """ 
-    Extract title by finding the largest font size in first page 
-    
-    """
-    precision = 1
-    output = ''
-    largest_font = get_largest_font_size(pdf)
-    title_page = pdf.pages[0]
-    title_page_chars = pdf.pages[0].chars
-    
-    for i in title_page_chars:
-        if (i['size'] - largest_font < precision) and (i['size'] - largest_font > -precision):
-            output += str(i['text'])
-
-    filtered = title_page.filter(lambda x: x.get("size", 0) > 13)
-    #print(filtered.extract_text())
+import logging
+import logging.config
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': True,
+})
+log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+log.info('imported title final')
 
 
+#################### INPUT / COMMON ####################
+'''
+Used to fetch files from filesystem and perform parsing
+for each file in specified directory
+'''
 
-    return output
-
-
-def get_largest_font_size(plumbed: pdfplumber.PDF):
-    title_page_chars = plumbed.pages[0].chars # only first page used
-    largest_font = 0.0
-    cur = 0.0
-    for i in title_page_chars:
-        if(i['size'] > largest_font):
-            largest_font = i['size']
-            cur = largest_font
-    return largest_font   
-"""
-!TODO: Fix false positives for pdf with larger capital letter than first title
-Hypothesis:
-    * if font size decreases, then title has been passed
-    * extract first 2-3 lines as raw text and compare with best matches of large font size strings
-    
-    * use lambda function to filter out all chars with size < x (?)
-    
-    
-    
-""" 
-###############################################################################
-    
-def debug(directory):
-    """ Attempt title extraction of titles of all pdf files in specified directory
-
-    Args:
-        directory (string): path to directory containing pdf files
-    """
-    meta_missing = 0 # count of files without metadata
-    count = 0 # count of pdf files processed
-    meta_no_match = 0 # amount of titles not matching with metadata
-    lenght = 50 # max lenght of title to display
-    tab = '\t' # tab for formatting
-    disp_meta = True
-    disp_line = True
-    print('')
-    print("[RUNNING irisaparser.title.debug()]")
+def parseDir(directory):
     for filename in os.listdir(directory):
-        f = os.path.join(directory, filename)
+        pdf_file_path = os.path.join(directory, filename)
+        log.info('now parsing ' + pdf_file_path)
+        if os.path.isfile(pdf_file_path):
+            with pdfplumber.open(pdf_file_path) as pdf:
+                title = parseTitle(pdf)
 
-        if os.path.isfile(f):
-            count = count + 1
-            title_meta,title_line,title_font_extracted = extract(f)
-            print('['+ str(count) + ']',end=tab)
+#################### FILTERS / CROP ####################
+
+def filter_lines(line_list):
+    res=[]
+    for line in line_list:
+        valid = True
+        # catching incorrect lines
+        if(len(line)<2):
+            valid = False
+        
+        
+        # final check
+        if(valid == True):
+            res.append(line)
+    # return only first 5 valid lines
+    return res[:5]
+
+def crop_first_page(pdf:pdfplumber.PDF,do_crop=False):
+    """Return only first page of pdf"""
+    page = pdf.pages[0]
+    
+    if(do_crop==True):# WARNING : MAY CAUSE BOUNDING BOXES ERROR
+        # cropping parameters    
+        x0 = 0 # top left corner
+        top = 0 # distance from top of page
+        x1 = page.width # top right corner
+        bottom = float(page.height)/3.0 # distance from bottom of page
+        page = page.crop((x0, top, x1, bottom))
+    
+    return page
+
+
+def filterFonts(fonts):
+    """Return only fonts above threshold"""
+    threshold = 8.0
+    res = []
+    for font in fonts:
+        if(font>threshold):
+           res.append(font)
+    return res 
+    
+
+def filter_potential_titles(titles):
+    res = []
+    
+    for title in titles:
+        valid = True
+        char_only = str(title).strip()
+        lenght = len(char_only)
+        
+        if(lenght<2 or lenght>80):
+            valid = False
             
-            # metadata
-            if(title_meta == 'NULL' or title_meta==''):
-                if(disp_meta):
-                    print(Fore.RED + 'meta : N/A' + Fore.RESET,end=tab)
-                meta_missing = meta_missing + 1
-            else:
-                if(disp_meta):
-                    print(Fore.GREEN + 'meta : ' + title_meta + Fore.RESET,end=tab)
-            
-            # first line
-            if(disp_line):
-                if(title_line == 'NULL' or title_line==''):
+        # catch wrong titles
+        if(valid==True):
+            res.append(title)
+    return res
 
-                    print(Fore.RED + 'line : N/A' + Fore.RESET,end=tab)
-                else:
-                    print(Fore.MAGENTA + 'line : ' + title_line[0:lenght] + '..' + Fore.RESET,end=tab)
-            # first line matching meta
-            if(title_line[0:5]!=title_meta[0:5]):
-                meta_no_match = meta_no_match + 1
-            
-            # font size
-            #print(Fore.CYAN + 'font : ' + title_font_extracted[0:lenght] + '..' + Fore.RESET)
-            print('')
+#################### PARSING ####################
+
+    
+def line_potential_line_matcher(lines,potential_title):
+    sentence = ''
+    res = []
+    for p_title in potential_title:
+        for line in lines:
+            scan = line.strip()
+            if(p_title.find(scan)):
+                sentence = sentence + line + ' '
+        res.append(sentence)
+        sentence = ''
+    print(Fore.CYAN + 'matches : ' + Fore.RESET,end='')
+    print(res)
 
 
-    print("== summary == ")
-    print("total pdf files \t\t: " + Fore.YELLOW + str(count) + Fore.RESET)
-    print("w/o title metadata \t\t: " + Fore.RED + str(meta_missing) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_missing/count*100,1)) + "%)")
-    print("w/o title as first line \t: " + Fore.RED +  str(meta_no_match) + Fore.RESET + "/" + str(count) + " (" + str(round(meta_no_match/count*100,1)) + "%)")
-    print("== end summary == ")
-    print("")
 
+
+def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
+    """ return array with x largest sentences in pdf file """
+    res = []
+    page = pdf.pages[0]
+
+    num_sentences = len(font_list)
+    i = 0
+    potent_title = ''
+    while i < num_sentences:
+        for char in page.chars:
+            #print('i:' + str(i) + ' char: ' + char.get('text'))         
+            if(char.get('size') == font_list[i]):
+                potent_title += char.get('text')
+        res.append(potent_title)
+        potent_title=''
+        i = i + 1
+
+    return res  
+
+def getPageLargestFontsList(page,fontAmount):
+    """ Return array with x largest lines in page """
+    res = {}
+    font_list_uniq = []
+    current_font=0.0
+    page_fonts = []
+    # find every fonts in page
+    for char in page.chars:
+        scan = round(char.get('size'),4)
+        # only add to list fonts that are different 
+        if scan not in page_fonts:
+            page_fonts.append(scan)
+    
+    # sort fonts from largest to smallest
+    page_fonts.sort(reverse=True)
+    page_fonts = page_fonts[:fontAmount-1]
+    
+    return page_fonts
+
+
+def extract_potential_titles(page,largestFonts):
+    sentences = []
+    for font in largestFonts:
+        scan = ''
+        for char in page.chars:
+            if(round(char.get('size'),4) == font):
+                scan = scan + char.get('text')
+        sentences.append(scan)
+    return sentences
+    
+def parseTitle(pdf:pdfplumber.PDF):
+    # get Only 1/3 of pdf's first page
+    page = crop_first_page(pdf)
+    
+    # get text line by line 
+    text = page.extract_text()
+    # store in list
+    lines = text.split('\n')
+    
+    # remove useless lines and keep only first 5 valid lines
+    lines = filter_lines(lines)
+    
+    # fetch only 5 largest fonts in page
+    largestFonts = getPageLargestFontsList(pdf,5)
+    
+    # only use fonts above threshold
+    largestFonts = filterFonts(largestFonts)
+
+    # find in whole page, sequences containing largest fonts
+    potential_titles = extract_potential_titles(page,largestFonts)    
+    
+    potential_titles = filter_potential_titles(potential_titles)
+    print(potential_titles)
+    final_title=''
+    return final_title
+    
+    
 
 
 
 
 if __name__ == '__main__':
-    debug('./tests/corpus_istex/')
+    time_start = time.time()
+    parseDir('./tests/corpus/')
+    time_end = time.time()
+    print('TIME : ' + str(round(time_end-time_start,2)) + 's')
