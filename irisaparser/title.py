@@ -1,8 +1,6 @@
 from argparse import ArgumentError
 import logging
-
 from time import time
-
 import pdfplumber
 import os
 import colorama
@@ -93,10 +91,12 @@ def filter_potential_titles(titles):
 
 
 def filter_matches(titles):
-    res = titles
-    for i in res:
-        i = i.strip()
-        i = ''.join(i.split())
+    test = titles
+    res = []
+    for i in test:
+        i = i.strip() # remove extra spaces at beginning and end
+        i = ' '.join(i.split())
+        res.append(i) 
     res = list(dict.fromkeys(res))
     return res
 
@@ -151,7 +151,8 @@ def extract_potential_titles(page,largestFonts):
     return sentences
 
 
-def parse_potential_titles(lines,potential_titles):
+def parse_potential_titles(lines_input,potential_titles):
+    lines = lines_input
     res = []
     for pot_title in potential_titles:
         prev = ''
@@ -170,23 +171,41 @@ def parse_potential_titles(lines,potential_titles):
             if(concat_prev == raw_title):
                 res.append((prev + " " + line))
             prev=line
-                
+    print(res)
     return res
+
+def filter_bad_metadata(meta):
+    if(meta==None):
+        return None
+    if(len(meta.strip())<5):
+        return None
+    if("/" in meta):
+        return None
+    if('\\' in meta):
+        return None
+    if("(" in meta):
+        return None
+    if(")" in meta):
+        return None
+    return meta
+
+
 
 def get_title_metadata(pdf:pdfplumber.PDF):
     meta_title=pdf.metadata.get('Title')
-    if(meta_title is None or (len(meta_title.strip())==0)):
+    meta_title=filter_bad_metadata(meta_title)
+    if(meta_title is None):
         print(Fore.RED + "[*]ERROR : NO VALID METADATA FOUND" + Fore.RESET)
         return None
-    else:
-        return meta_title
+    
+    return meta_title
     
 def parseTitle(pdf:pdfplumber.PDF):
     # get Only 1/3 of pdf's first page
     page = crop_first_page(pdf)
     
     # get text line by line 
-    text = page.extract_text()
+    text = page.extract_text(x_tolerance=3, y_tolerance=3)
     # store in list
     lines = text.split('\n')
     
@@ -210,6 +229,7 @@ def parseTitle(pdf:pdfplumber.PDF):
     # filter duplicates
     matched = filter_matches(matched)
     final_title = ''
+    ##### FALLBACKS
     errcount = 0
     if(len(matched)>1):
         errcount = errcount +1
@@ -222,6 +242,8 @@ def parseTitle(pdf:pdfplumber.PDF):
         if(meta_title is None):
             print(Fore.BLUE + "[*]WARN : NO TITLE METADATA FOUND ! falling back on first line..." + Fore.RESET)
             final_title = lines[0]
+        else:
+            final_title = meta_title
 
     if(len(matched)==1):
         final_title = matched[0]
