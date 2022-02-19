@@ -1,0 +1,19 @@
+{
+  "manifestVersion": "1.0",
+  "creationDate": "2022-2-16",
+  "creationTimestamp": 1645002884876,
+  "query": {
+    "q": "arkIstex.raw:(\"ark:/67375/QHD-C3QBTHLZ-H\" \"ark:/67375/QHD-L4HCJXDB-S\" \"ark:/67375/QHD-RQ5M2R3N-8\" \"ark:/67375/0T8-RQDJHVLV-7\" \"ark:/67375/TPS-8BNTXBD1-F\" \"ark:/67375/0T8-FZRNH26P-B\" \"ark:/67375/0T8-N6RS9HD2-P\" \"ark:/67375/0T8-HMX44PM7-5\" \"ark:/67375/QHD-3Q38X5DK-W\" \"ark:/67375/80W-2GW3P1VH-G\" \"ark:/67375/QHD-Z7TD40TZ-J\" \"ark:/67375/0T8-RZ5TZD7P-Z\" \"ark:/67375/TPS-DBW3F063-9\" \"ark:/67375/TPS-VL37PB0M-M\" \"ark:/67375/QHD-M0H2WSHN-W\" \"ark:/67375/0T8-DJH7NX32-7\" \"ark:/67375/0T8-5BM0JBM5-8\" \"ark:/67375/0T8-P300P0M3-6\" \"ark:/67375/0T8-LKX266H5-D\" \"ark:/67375/0T8-S4K339R0-N\")",
+    "extract": "fulltext[pdf];metadata[json]",
+    "size": "20",
+    "rankBy": "qualityOverRelevance",
+    "archiveType": "zip",
+    "compressionLevel": "9",
+    "sid": "istex-dl",
+    "usage": "1",
+    "total": "20",
+    "queryType": "querywithARK",
+    "totalResults": 20
+  },
+  "url": "/document/?q=arkIstex.raw:(%22ark:/67375/QHD-C3QBTHLZ-H%22%20%22ark:/67375/QHD-L4HCJXDB-S%22%20%22ark:/67375/QHD-RQ5M2R3N-8%22%20%22ark:/67375/0T8-RQDJHVLV-7%22%20%22ark:/67375/TPS-8BNTXBD1-F%22%20%22ark:/67375/0T8-FZRNH26P-B%22%20%22ark:/67375/0T8-N6RS9HD2-P%22%20%22ark:/67375/0T8-HMX44PM7-5%22%20%22ark:/67375/QHD-3Q38X5DK-W%22%20%22ark:/67375/80W-2GW3P1VH-G%22%20%22ark:/67375/QHD-Z7TD40TZ-J%22%20%22ark:/67375/0T8-RZ5TZD7P-Z%22%20%22ark:/67375/TPS-DBW3F063-9%22%20%22ark:/67375/TPS-VL37PB0M-M%22%20%22ark:/67375/QHD-M0H2WSHN-W%22%20%22ark:/67375/0T8-DJH7NX32-7%22%20%22ark:/67375/0T8-5BM0JBM5-8%22%20%22ark:/67375/0T8-P300P0M3-6%22%20%22ark:/67375/0T8-LKX266H5-D%22%20%22ark:/67375/0T8-S4K339R0-N%22)&extract=fulltext[pdf];metadata[json]&size=20&rankBy=qualityOverRelevance&archiveType=zip&compressionLevel=9&sid=istex-dl&usage=1&total=20&queryType=querywithARK"
+}
