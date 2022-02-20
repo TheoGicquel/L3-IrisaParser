@@ -10,13 +10,14 @@ import spacy
 import re
 import time
 from datetime import timedelta
+import os.path
 
 nlp = spacy.load("en_core_web_md")
 
 
 def getExpectedInfoOnPDF(pdfFilePath):
     # Datas are in JSON file in the same folder BUT with different name ( SPECIFIC TO ISTEX CORPUS )
-    with open(glob.glob(pdfFilePath.split("/")[0]+"/*.json")[0]) as jsonFile: 
+    with open(glob.glob(os.path.dirname(pdfFilePath)+"/*.json")[0]) as jsonFile: 
         return json.load(jsonFile)
 
 
@@ -114,7 +115,7 @@ numberOfPDFfiles = 0
 start_time = time.time()
 
 # For each PDF file in the current and subsequent directory
-for pdfFile in glob.glob('**/*.pdf'):
+for pdfFile in glob.glob('./**/*.pdf',recursive=True):
     
     """
     # Just treat 100 PDFs to tests some changes
