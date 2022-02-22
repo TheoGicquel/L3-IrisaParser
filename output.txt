@@ -1,0 +1,87 @@
+MACAON
+An NLP Tool Suite for Processing Word Lattices
+∗
+AlexisNasr Fre´de´ricBe´chet Jean-Franc¸oisRey BenoˆıtFavre JosephLeRoux
+Laboratoired’InformatiqueFondamentaledeMarseille-CNRS-UMR6166
+Universite´ Aix-Marseille
+(alexis.nasr,frederic.bechet,jean-francois.rey,benoit.favre,joseph.le.roux)
+@lif.univ-mrs.fr
+Abstract
+is a suite of tools developped to pro-
+MACAON
+cess ambiguous input and extend inference of in-
+isatoolsuiteforstandardNLPtasks
+MACAON
+put modules within a global scope. It con-
+developedforFrench. hasbeende-
+MACAON
+sists in several modules that perform classical
+signed to process both human-produced text
+NLP tasks (tokenization, word recognition, part-of-
+andhighlyambiguousword-latticesproduced
+speechtagging,lemmatization,morphologicalanal-
+byNLPtools. ismadeofseveralna-
+MACAON
+ysis, partial or full parsing) on either native text
+tivemodulesforcommontaskssuchasatok-
+or word lattices. is distributed under
+enization, a part-of-speech tagging or syntac- MACAON
+ticparsing,allcommunicatingwitheachother GNU public licence and can be downloaded from
+through ﬁles.Inaddition,exchangepro-
+http://www.macaon.lif.univ-mrs.fr/
+XML .
+tocolswithexternaltoolsareeasilydeﬁnable.
+Fromageneralpointofview,a module
+MACAON
+isafast,modularandopentool,dis-
+MACAON
+1
+can be seen as an annotation device which adds a
+tributedunderGNUPublicLicense.
+newlevelofannotationtoitsinputthatgenerallyde-
+pends on annotations from preceding modules. The
+1 Introduction
+modulescommunicatethrough ﬁlesthatallow
+XML
+the representation different layers of annotation as
+The automatic processing of textual data generated
+wellasambiguitiesateachlayer. Moreover,theini-
+by NLP software, resulting from Machine Transla-
+tial structuring of the processed ﬁles (logical
+XML
+tion, Automatic Speech Recognition or Automatic
+structuringofadocument,informationfromtheAu-
+Text Summarization, raises new challenges for lan-
+tomatic Speech Recognition module ...) remains
+guage processing tools. Unlike native texts (texts
+untouchedbytheprocessingstages.
+produced by humans), this new kind of texts is the
+As already mentioned, one of the main charac-
+result of imperfect processors and they are made
+teristics of is the ability for each module
+MACAON
+of several hypotheses, usually weighted with con-
+toacceptambiguousinputsandproduceambiguous
+ﬁdence measures. Automatic text production sys-
+outputs, in such a way that ambiguities can be re-
+tems can produce these weighted hypotheses as n-
+solved at a later stage of processing. The compact
+bestlists,wordlattices,orconfusionnetworks. Itis
+representationofambiguousstructuresisattheheart
+crucial for this space of ambiguous solutions to be
+of the exchange format, described in sec-
+MACAON
+keptforlaterprocessingsincetheambiguitiesofthe
+tion 2. Furthermore every module can weight the
+lowerlevelscansometimesberesolvedduringhigh-
+solutions it produces. such weights can be used to
+level processing stages. It is therefore important to
+rank solutions or limit their number for later stages
+beabletorepresentthisambiguity.
+∗ 1
+ThisworkhasbeenfundedbytheFrenchAgenceNationale Annotationmustbetakenhereinageneralsensewhichin-
+pourlaRecherche, throughtheprojectsSEQUOIA(ANR-08- cludestagging,segmentationortheconstructionofmorecom-
+EMER-013)andDECODA(2009-CORD-005-01) plexobjetsassyntagmaticordependenciestrees.
+86
+ProceedingsoftheACL-HLT2011SystemDemonstrations,pages86–91,
+Portland,Oregon,USA,21June2011.(cid:13)c2011AssociationforComputationalLinguistics
