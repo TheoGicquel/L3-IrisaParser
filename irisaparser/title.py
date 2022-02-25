@@ -19,7 +19,7 @@ Used to fetch files from filesystem and perform parsing
 for each file in specified directory
 '''
 
-def parseDir(directory):
+def parse_dir(directory):
     result = []
     for filename in os.listdir(directory):
         pdf_file_path = os.path.join(directory, filename)
@@ -62,7 +62,7 @@ def crop_first_page(pdf:pdfplumber.PDF,do_crop=False):
     return page
 
 
-def filterFonts(fonts):
+def filter_fonts(fonts):
     """Return only fonts above threshold"""
     threshold = 8.0
     res = []
@@ -211,7 +211,7 @@ def parse_title(pdf:pdfplumber.PDF):
     largest_fonts = get_page_largest_fonts_list(pdf,5)
     
     # only use fonts above threshold
-    largest_fonts = filterFonts(largest_fonts)
+    largest_fonts = filter_fonts(largest_fonts)
 
     # find in whole page, sequences of text matching largest fonts
     potential_titles = extract_potential_titles(page,largest_fonts)    
@@ -253,6 +253,6 @@ def parse_title(pdf:pdfplumber.PDF):
 
 if __name__ == '__main__':
     time_start = time.time()
-    parseDir('./tests/corpus/')
+    parse_dir('./tests/corpus/')
     time_end = time.time()
     print('TIME : ' + str(round(time_end-time_start,2)) + 's')
