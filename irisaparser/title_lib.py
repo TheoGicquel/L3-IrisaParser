@@ -4,20 +4,28 @@ import pdfplumber
 import os
 from colorama import init,Fore
 import time
-#!TODO : Add debug flag
-init() #initialize colorama 
 
+init() #initialize colorama 
+title_debug = False
+
+debug_prefix = Fore.LIGHTBLACK_EX+ "(title)"
 #################### INPUT / COMMON ####################
 '''
 Used to fetch files from filesystem and perform parsing
 for each file in specified directory
 '''
+def enable_debug():
+    title_debug=True
+
+def disable_debug():
+    title_debug=False
+
 
 def parse_dir(directory):
     result = []
     for filename in os.listdir(directory):
         pdf_file_path = os.path.join(directory, filename)
-        print(Fore.MAGENTA+'[<]INPUT : PARSING "'+pdf_file_path+'"'+ Fore.RESET)
+        if(title_debug):print(debug_prefix +Fore.MAGENTA+'[<]INPUT : PARSING "'+pdf_file_path+'"'+ Fore.RESET)
 
         if os.path.isfile(pdf_file_path):
             with pdfplumber.open(pdf_file_path) as pdf:
@@ -46,6 +54,7 @@ def crop_first_page(pdf:pdfplumber.PDF,do_crop=False):
     page = pdf.pages[0]
     
     if(do_crop==True):# WARNING : MAY CAUSE BOUNDING BOXES ERROR
+        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : Attemtping to crop page, may cause crash" + Fore.RESET)
         # cropping parameters    
         x0 = 0 # top left corner
         top = 0 # distance from top of page
@@ -183,7 +192,7 @@ def get_title_metadata(pdf:pdfplumber.PDF):
     meta_title=pdf.metadata.get('Title')
     meta_title=filter_bad_metadata(meta_title)
     if(meta_title is None):
-        print(Fore.RED + "[*]ERROR : NO VALID METADATA FOUND" + Fore.RESET)
+        if(title_debug):print(debug_prefix+Fore.RED + "[*]ERROR : NO VALID METADATA FOUND" + Fore.RESET)
         return None
     
     return meta_title
@@ -221,14 +230,14 @@ def parse_title(pdf:pdfplumber.PDF):
     errcount = 0
     if(len(matched)>1):
         errcount = errcount +1
-        print(Fore.BLUE + "[*]WARN : multiple titles ! selecting [0] by default" + Fore.RESET)
+        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : multiple titles ! selecting [0] by default" + Fore.RESET)
         final_title = matched[0]
     
     if(len(matched)==0):
-        print(Fore.BLUE + "[*]WARN : NO REGULAR TITLE FOUND ! falling back on metadata" + Fore.RESET)
+        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : NO REGULAR TITLE FOUND ! falling back on metadata" + Fore.RESET)
         meta_title = get_title_metadata(pdf)
         if(meta_title is None):
-            print(Fore.BLUE + "[*]WARN : NO TITLE METADATA FOUND ! falling back on first line..." + Fore.RESET)
+            if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : NO TITLE METADATA FOUND ! falling back on first line..." + Fore.RESET)
             final_title = lines[0]
         else:
             final_title = meta_title
@@ -236,12 +245,13 @@ def parse_title(pdf:pdfplumber.PDF):
     if(len(matched)==1):
         final_title = matched[0]
     
-    print(Fore.GREEN + '[>]RESULT : "' + Fore.RESET + final_title + Fore.GREEN + '"\n')
+    if(title_debug):print(debug_prefix+Fore.GREEN + '[>]RESULT : "' + Fore.RESET + final_title + Fore.GREEN + '"\n')
     return final_title
     
 
 if __name__ == '__main__':
+    enable_debug()
     time_start = time.time()
     parse_dir('./tests/corpus/')
     time_end = time.time()
-    print('TIME : ' + str(round(time_end-time_start,2)) + 's')
+    if(title_debug):print(debug_prefix+'TIME : ' + str(round(time_end-time_start,2)) + 's')
