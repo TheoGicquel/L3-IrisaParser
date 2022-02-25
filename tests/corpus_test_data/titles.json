@@ -10,5 +10,5 @@
 "./tests/corpus/Mikolov.pdf":"Efficient Estimation of Word Representations in Vector Space",
 "./tests/corpus/Nasr.pdf":"MACAON An NLP Tool Suite for Processing Word Lattices",
 "./tests/corpus/Torres-moreno1998.pdf":"Efficient Adaptive Learning for Classification Tasks with Binary Units",
-"./tests/corpus/Torres.pdf":"Summary Evaluation with and without References",
+"./tests/corpus/Torres.pdf":"Summary Evaluation with and without References"
 }
