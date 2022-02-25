@@ -1,17 +1,11 @@
-from argparse import ArgumentError
 import logging
 from time import time
 import pdfplumber
 import os
-import colorama
-from colorama import init,Fore,Back,Style
+from colorama import init,Fore
 import time
-
+#!TODO : Add debug flag
 init() #initialize colorama 
-import logging
-
-log = logging.getLogger(__name__)
-
 
 #################### INPUT / COMMON ####################
 '''
@@ -23,7 +17,7 @@ def parse_dir(directory):
     result = []
     for filename in os.listdir(directory):
         pdf_file_path = os.path.join(directory, filename)
-        print(Fore.MAGENTA + '[<]INPUT : PARSING "'+pdf_file_path+'"' + Fore.RESET)
+        print(Fore.MAGENTA+'[<]INPUT : PARSING "'+pdf_file_path+'"'+ Fore.RESET)
 
         if os.path.isfile(pdf_file_path):
             with pdfplumber.open(pdf_file_path) as pdf:
@@ -87,7 +81,6 @@ def filter_potential_titles(titles):
         # catch wrong titles
         if(valid==True):
             res.append(title)
-    log.debug("filtered matches :" + str(res))
     return res
 
 
@@ -246,10 +239,6 @@ def parse_title(pdf:pdfplumber.PDF):
     print(Fore.GREEN + '[>]RESULT : "' + Fore.RESET + final_title + Fore.GREEN + '"\n')
     return final_title
     
-    
-
-
-
 
 if __name__ == '__main__':
     time_start = time.time()
