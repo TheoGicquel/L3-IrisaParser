@@ -1,5 +1,3 @@
-import pdfplumber as pp
-import sys
 import os
 from tika import parser 
 
@@ -12,36 +10,37 @@ file = os.path.join(corpusPath,"Nasr.pdf")
 
 parsed = parser.from_file(file)  
 
-listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
-
-print(listPdf)
+#listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
+#
+#print(listPdf)
 
 def abstract_extractor(parsed):
     abstr = parsed["content"].upper().find('ABSTRACT')
     intro = parsed["content"].upper().find('INTRODUCTION')
 
+    print(intro)
+    print(abstr)
+
     text = parsed["content"]
 
-    text.format()
+    print(text)
 
     if abstr == -1:
-        splitedText = text[:intro].split("\n\n")
+        splited_text = text[:intro].split("\n\n")
 
-        for x in splitedText:
+        for x in splited_text:
             if len(x) > 150:
                 return x
         return "error"
-                
-        
 
     else:
         cut = 0
-        for x in range(intro, abs, -1):
-
+        for x in range(intro, abstr, -1):
             if text[x] == "\n" and text[x-1] == "\n":
                 cut = x
                 break
-        return text[abs:cut]
+        print(text[abstr:cut])
+        return text[abstr:cut]
 
     
 
