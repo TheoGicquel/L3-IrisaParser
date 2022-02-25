@@ -14,11 +14,6 @@ debug_prefix = Fore.LIGHTBLACK_EX+ "(title)"
 Used to fetch files from filesystem and perform parsing
 for each file in specified directory
 '''
-def enable_debug():
-    title_debug=True
-
-def disable_debug():
-    title_debug=False
 
 
 def parse_dir(directory):
@@ -123,6 +118,7 @@ def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
 
     return res  
 
+
 def get_page_largest_fonts_list(page,font_amount):
     """ Return array with x largest lines in page """
 
@@ -171,6 +167,7 @@ def parse_potential_titles(lines_input,potential_titles):
             prev=line
     return res
 
+
 def filter_bad_metadata(meta):
     if(meta==None):
         return None
@@ -185,7 +182,6 @@ def filter_bad_metadata(meta):
     if(")" in meta):
         return None
     return meta
-
 
 
 def get_title_metadata(pdf:pdfplumber.PDF):
@@ -248,10 +244,9 @@ def parse_title(pdf:pdfplumber.PDF):
     if(title_debug):print(debug_prefix+Fore.GREEN + '[>]RESULT : "' + Fore.RESET + final_title + Fore.GREEN + '"\n')
     return final_title
     
-
 if __name__ == '__main__':
-    enable_debug()
+    title_debug = True
     time_start = time.time()
     parse_dir('./tests/corpus/')
     time_end = time.time()
-    if(title_debug):print(debug_prefix+'TIME : ' + str(round(time_end-time_start,2)) + 's')
+    if(title_debug):print(debug_prefix+'TIME : '+ Fore.RESET + str(round(time_end-time_start,2)) + 's')
