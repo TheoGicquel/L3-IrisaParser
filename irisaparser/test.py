@@ -12,28 +12,39 @@ file = os.path.join(corpusPath,"Nasr.pdf")
 
 parsed = parser.from_file(file)  
 
-#with pp.open(file) as pdf:
-#    first_page = pdf.pages[0]
-#
-#    text = first_page.extract_text(y_tolerance=0.5)
+listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
 
+print(listPdf)
 
-#print(type(text))
-#output_file.write(text.encode())
-#output_file.close()
-#
-#test_file = open("test.txt", "wb")
-#
-#print(len(first_page.chars))
-#print(first_page.chars[0].keys())
+def abstract_extractor(parsed):
+    abstr = parsed["content"].upper().find('ABSTRACT')
+    intro = parsed["content"].upper().find('INTRODUCTION')
 
-#for index,obj in enumerate(first_page.chars):
-#    test_line = str("> "+obj['text']+"("+str(obj['x0'])+","+str(obj['y0'])+")->("+str(obj['x1'])+","+str(obj['y1'])+")\n")
-#    test_file.write(test_line.encode('utf-8'))
-#    print(index)
-#    if(index == 5): break
+    text = parsed["content"]
 
-file.write(parsed["content"].encode())
+    text.format()
 
+    if abstr == -1:
+        splitedText = text[:intro].split("\n\n")
 
-test_file.close()
+        for x in splitedText:
+            if len(x) > 150:
+                return x
+        return "error"
+                
+        
+
+    else:
+        cut = 0
+        for x in range(intro, abs, -1):
+
+            if text[x] == "\n" and text[x-1] == "\n":
+                cut = x
+                break
+        return text[abs:cut]
+
+    
+
+output_file.write(abstract_extractor(parsed).encode())
+
+output_file.close()
