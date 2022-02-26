@@ -120,7 +120,7 @@ def get_sentences(pdf: pdfplumber.PDF,max_sentences,font_list):
 
 
 def get_page_largest_fonts_list(page,font_amount):
-    """ Return array with x largest lines in page """
+    """ Return array with x largest fonts in page """
 
     page_fonts = []
     # find every fonts in page
