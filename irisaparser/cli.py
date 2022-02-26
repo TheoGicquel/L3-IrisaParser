@@ -1,6 +1,8 @@
 import sys
 import os
-
+import traceback
+import title_lib
+import pdfplumber
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -124,30 +126,26 @@ def check_args_and_retrive_filenames(args):
 
 
 def extractFileName(input):
-    # TODO
-    pass
+    return "not found"
 
-def extractTitle(input):
-    # TODO
-    pass
+def extractTitle(pdf:pdfplumber.PDF):
+    return title_lib.parse_title(pdf)
 
 def extractAuthors(input):
-    # TODO
-    pass
+    return ["not found"]
 
 def extractAbstract(input):
-    # TODO
-    pass
+    return "not found"
 
 def parse_file(filename):
 
     # TODO pdf work here
-
+    pdf = pdfplumber.open(filename)
     # TODO input for extracts here
 
     ret = {}
-    ret["fileName"] = extractFileName(None)
-    ret["title"] = extractTitle(None)
+    ret["fileName"] = os.path.basename(filename)
+    ret["title"] = extractTitle(pdf)
     ret["authors"] = extractAuthors(None)
     ret["abstract"] = extractAbstract(None)
     return ret
@@ -164,12 +162,12 @@ def create_text_output(extracted_text,outPutPath):
         authorsStr += extracted_text["authors"][0]+"\n"
 
     output_text = "fichier source: "+extracted_text["fileName"]+"\n\n"
-    output_text += "titre: "+extracted_text["titre"]+"\n\n"
+    output_text += "titre: "+extracted_text["title"]+"\n\n"
     output_text += authorsStr+"\n"
     output_text += "abstract: \n"+extracted_text["abstract"]+"\n"
 
     outFileName = extracted_text["fileName"]+"_extracted.txt"
-    outFile = open((os.path.join(outPutPath,outFileName)),"wt")
+    outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
 
@@ -180,12 +178,16 @@ if __name__ == "__main__":
     try:
         ret = check_args_and_retrive_filenames(sys.argv[1:])
         if ret.get("help") == None :
-            print(str(ret["files"])) # debug
-            # TODO uncomment that when merging stuff
-            #outputDir = ret["output"] if ret.get("ouput") != None else "./";
-            #for file in ret["files"]:
-            #    extracted_text = parse_file(file)
-            #    create_text_output(extracted_text,outputDir)
+            #print(str(ret["files"])) # debug
+            outputDir = ret["output"] if ret.get("output") != None else "./";
+            for file in ret["files"]:
+                try:
+                    extracted_text = parse_file(file)
+                    create_text_output(extracted_text,outputDir)
+                except UnicodeEncodeError as ex:
+                    print(" unexpected unicode error: ",end="")
+                    print(traceback.format_exc())
+
     except ArgumentException as ex:
         print("error: "+str(ex))
         print("use -h or --help for usage"+"\n")
