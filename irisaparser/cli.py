@@ -39,7 +39,7 @@ def check_args_and_retrive_filenames(args):
 
     - "help" -> if help key is set then help message was displayed and nothing else should be done
     - "output" -> if output key is set then an output dir was specified, the value of the key is the path of the output directory
-    - "files" -> this ket is always set except when help key is set
+    - "files" -> this key is always set except when help key is set
 
     raise ArgumentException if an illegal argument combination is passed,
     note that missing files and directory are ignored and don't raise exception
