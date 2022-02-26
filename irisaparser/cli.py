@@ -8,8 +8,8 @@ class ArgumentException(Exception):
     pass
 
 # return an array of file in a list of directories (not recursively)
-def get_files_from_directories(directories):
-    files = []
+def get_files_from_directories(files,directories):
+    newFiles = []
 
     for directory in directories:
         if(os.path.exists(directory)):
@@ -18,15 +18,18 @@ def get_files_from_directories(directories):
                 for fileName in dirFiles:
                     file = os.path.join(directory,fileName)
                     if(os.path.isfile(file)):
-                        files.append(file)
+                        if not file in files:
+                            newFiles.append(file)
+                        else:
+                            print("file: "+file+" in directory: "+directory+" already provided, ignored")
             else:
                 print("directory: "+directory+" not a directory, ignored")
         else:
             print("directory: "+directory+" not found, ignored")
 
-        if(len(files) == 0): print("directory: "+directory+" no valid file found")
+        if(len(newFiles) == 0): print("directory: "+directory+" no valid file found")
 
-    return files
+    return newFiles
 
 
 def check_args_and_retrive_filenames(args):
@@ -61,14 +64,14 @@ def check_args_and_retrive_filenames(args):
             Options :\n \
             -h, --help : display this help page\n \
             -d, --directory <directory> : specify a directory whose files will be to parsed, may be passed multiple times\n \
-            -o, --ouput_directory <output directory> : specify a directory where place ouput files")
+            -o, --ouput_directory <output directory> : specify a directory where place output files, you should not specify multiples output directories")
             return ret
 
         elif current_arg == "-d" or current_arg == "--directory": #directory
 
             if(index+1 >= len(args)):
                 raise ArgumentException("argument missing after "+current_arg)
-            elif(args[index]+1 in availables_option):
+            elif(args[index+1] in availables_option):
                 raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", directory expected")
             else:
                 index += 1
@@ -94,9 +97,10 @@ def check_args_and_retrive_filenames(args):
                     ret["output"] = outputDir
 
         # if not an option then it must be a file
-        else:
+        elif(not current_arg in files):
             files.append(current_arg)
-
+        else:
+            print("file: "+current_arg+" already provided, ignored")
         index += 1
 
     for file in files:
@@ -109,7 +113,7 @@ def check_args_and_retrive_filenames(args):
             files.remove(file)
 
     if(len(directories) > 0):
-        files = files + get_files_from_directories(directories)
+        files = files + get_files_from_directories(files,directories)
 
     if(len(files) < 1):
         raise ArgumentException("no valid file provided")
@@ -142,10 +146,10 @@ def parse_file(filename):
     # TODO input for extracts here
 
     ret = {}
-    ret["fileName"] = extractFileName(fileNameInputText)
-    ret["title"] = extractTitle(titleInputText)
-    ret["authors"] = extractAuthors(authorsInputText)
-    ret["abstract"] = extractAbstract(abtractInputText)
+    ret["fileName"] = extractFileName(None)
+    ret["title"] = extractTitle(None)
+    ret["authors"] = extractAuthors(None)
+    ret["abstract"] = extractAbstract(None)
     return ret
 
 def create_text_output(extracted_text,outPutPath):
@@ -177,13 +181,11 @@ if __name__ == "__main__":
         ret = check_args_and_retrive_filenames(sys.argv[1:])
         if ret.get("help") == None :
             print(str(ret["files"])) # debug
-            outputDir = ret["output"] if ret["output"] != None else "./";
-            for file in ret["files"]:
-                extracted_text = parse_file(file)
-                create_text_output(extracted_text,outputDir)
+            # TODO uncomment that when merging stuff
+            #outputDir = ret["output"] if ret.get("ouput") != None else "./";
+            #for file in ret["files"]:
+            #    extracted_text = parse_file(file)
+            #    create_text_output(extracted_text,outputDir)
     except ArgumentException as ex:
         print("error: "+str(ex))
         print("use -h or --help for usage"+"\n")
-    # put other exceptions here
-    except Exception as ex:
-        print("unexpected exception: "+str(ex))
