@@ -1,10 +1,13 @@
 import sys
 import os
 
-# TODO thinking about refactoring using dictionary instead of Array
-# to nest function to str and avoid if/elif in check_args
+# @authors : L.A and K.O
 
-# return an array of file in a directory
+# custom Exception for the sake of best practises
+class ArgumentException(Exception):
+    pass
+
+# return an array of file in a list of directories (not recursively)
 def get_files_from_directories(directories):
     files = []
 
@@ -25,71 +28,70 @@ def get_files_from_directories(directories):
 
     return files
 
-# check args
-def check_args(args):
 
-    ret = {}
+def check_args_and_retrive_filenames(args):
+    """
+    check arguments and return a dict
+    where key represents result of argument parsing posible keys :
+
+    - "help" -> if help key is set then help message was displayed and nothing else should be done
+    - "output" -> if output key is set then an output dir was specified, the value of the key is the path of the output directory
+    - "files" -> this ket is always set except when help key is set
+
+    raise ArgumentException if an illegal argument combination is passed,
+    note that missing files and directory are ignored and don't raise exception
+    """
+
+    argsCount = len(args)
+
     index = 0
 
     directories = []
     files = []
-    while(index < len(args)):
+
+    ret = {}
+
+    while(index < argsCount):
         current_arg = args[index]
 
-        # check if current arg is an option
-        if(small_option.count(current_arg) > 0 or long_option.count(current_arg) > 0):
-            try:
-                option_index = small_option.index(current_arg)
-            except ValueError:
-                try:
-                    option_index = long_option.index(current_arg)
-                except ValueError:
-                    pass
+        if current_arg == "-h" or current_arg == "--help": #help
+            ret = {}
+            ret["help"] = True
+            print("usage : irisaParser.py [-h| --help] | [-d|--directory <directory> ] [-o|--ouput_directory <outputDirectory>] <file> [files]...\n \
+            Options :\n \
+            -h, --help : display this help page\n \
+            -d, --directory <directory> : specify a directory whose files will be to parsed, may be passed multiple times\n \
+            -o, --ouput_directory <output directory> : specify a directory where place ouput files")
+            return ret
 
-            if(option_index == 0): #help
-                ret["help"] = True
-                print("usage : irisaParser.py [-h| --help] | [-d|--directory <directory> ] [-o|--ouput_directory <outputDirectory>] <file> [files]... \n")
-                print("Options : \n")
-                print("-h, --help : display this help page\n")
-                print("-d, --directory <directory> : specify a directory whose files will be to parsed, may be passed multiple times\n")
-                print("-o, --ouput_directory <output directory> : specify a directory where place ouput files \n")
-                break
+        elif current_arg == "-d" or current_arg == "--directory": #directory
 
-            elif(option_index == 1): #directory
+            if(index+1 >= len(args)):
+                raise ArgumentException("argument missing after "+current_arg)
+            elif(args[index]+1 in availables_option):
+                raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", directory expected")
+            else:
+                index += 1
+                directories.append(args[index])
 
-                if(index+1 >= len(args)):
-                    ret["error"] = "argument missing after "+current_arg
-                    break
-                elif(small_option.count(args[index+1]) > 0 or long_option.count(args[index+1]) > 0):
-                    ret["error"] = "invalid option "+args[index+1]+" after "+current_arg+", argument expected"
-                    break
+        elif current_arg == "-o" or current_arg == "--output_directory": #output directory
+
+            if(ret.get("output") != None):
+                raise ArgumentException("invalid duplicated option "+current_arg+", multiple output directories not allowed")
+            if(index+1 >= len(args)):
+                raise ArgumentException("argument missing after "+current_arg)
+            elif(args[index+1] in availables_option):
+                raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", argument expected")
+            else:
+                index += 1
+                outputDir = args[index]
+
+                if(not os.path.exists(outputDir)):
+                    raise ArgumentException("provided output "+outputDir+" not found")
+                elif(not os.path.isdir(outputDir)):
+                    raise ArgumentException("provided output "+outputDir+" is not a directory")
                 else:
-                    index += 1
-                    directories.append(args[index])
-
-            elif(option_index == 2): #output directory
-
-                if(ret.get("output") != None):
-                    ret["error"] = "invalid duplicated option "+current_arg+", multiple output directories not allowed"
-                    break
-                if(index+1 >= len(args)):
-                    ret["error"] = "argument missing after "+current_arg
-                    break
-                elif(small_option.count(args[index+1]) > 0 or long_option.count(args[index+1]) > 0):
-                    ret["error"] = "invalid option "+args[index+1]+" after "+current_arg+", argument expected"
-                    break
-                else:
-                    index += 1
-                    outputDir = args[index]
-
-                    if(not os.path.exists(outputDir)):
-                        ret["error"] = "provided output "+outputDir+" not found"
-                        break
-                    elif(not os.path.isdir(outputDir)):
-                        ret["error"] = "provided output "+outputDir+" is not a directory"
-                        break
-                    else:
-                        ret["output"] = outputDir
+                    ret["output"] = outputDir
 
         # if not an option then it must be a file
         else:
@@ -97,45 +99,91 @@ def check_args(args):
 
         index += 1
 
-    if(ret.get("error") == None and ret.get("help") == None):
+    for file in files:
 
-        for file in files:
+        if(not os.path.exists(file)):
+            print("file: "+file+" not found, ignored")
+            files.remove(file)
+        elif(not os.path.isfile(file)):
+            print("file: "+file+" not a file, ignored")
+            files.remove(file)
 
-            if(not os.path.exists(file)):
-                print("file: "+file+" not found, ignored")
-                files.remove(file)
-            elif(not os.path.isfile(file)):
-                print("file: "+file+" not a file, ignored")
-                files.remove(file)
+    if(len(directories) > 0):
+        files = files + get_files_from_directories(directories)
 
-        if(len(directories) > 0):
-            files = files + get_files_from_directories(directories)
+    if(len(files) < 1):
+        raise ArgumentException("no valid file provided")
 
-        if(len(files) < 1): 
-            ret["error"] = "no valid file provided"
-
-        ret["files"] = files
+    ret["files"] = files
 
     return ret
 
+
+def extractFileName(input):
+    # TODO
+    pass
+
+def extractTitle(input):
+    # TODO
+    pass
+
+def extractAuthors(input):
+    # TODO
+    pass
+
+def extractAbstract(input):
+    # TODO
+    pass
+
+def parse_file(filename):
+
+    # TODO pdf work here
+
+    # TODO input for extracts here
+
+    ret = {}
+    ret["fileName"] = extractFileName(fileNameInputText)
+    ret["title"] = extractTitle(titleInputText)
+    ret["authors"] = extractAuthors(authorsInputText)
+    ret["abstract"] = extractAbstract(abtractInputText)
+    return ret
+
+def create_text_output(extracted_text,outPutPath):
+
+    authorsStr = "auteurs: "
+
+    if len(extracted_text["authors"]) > 1 :
+        authorsStr += "\n"
+        for author in extracted_text["authors"]:
+            authorsStr += author+"\n"
+    else:
+        authorsStr += extracted_text["authors"][0]+"\n"
+
+    output_text = "fichier source: "+extracted_text["fileName"]+"\n\n"
+    output_text += "titre: "+extracted_text["titre"]+"\n\n"
+    output_text += authorsStr+"\n"
+    output_text += "abstract: \n"+extracted_text["abstract"]+"\n"
+
+    outFileName = extracted_text["fileName"]+"_extracted.txt"
+    outFile = open((os.path.join(outPutPath,outFileName)),"wt")
+    outFile.write(output_text)
+    outFile.close()
+
 # list of availables options
-small_option = ["-h","-d","-o"]
-long_option = ["--help","--directory","--output_directory"]
+availables_option = ["-h","-d","-o","--help","--directory","--output_directory"] 
 
-# args (file name is removed)
-args = sys.argv
-args.remove(args[0])
-
-# check args
-check_result = check_args(args)
-
-if(check_result.get("error") != None):
-    print("error: "+check_result.get("error")+"\n")
-    print("use -h or --help for usage"+"\n")
-
-elif(check_result.get("help") == None):
-    if(check_result.get("output") != None):
-        print("output: ")
-        print(check_result.get("output"))
-    print("files: ")
-    print(check_result.get("files"))
+if __name__ == "__main__":
+    try:
+        ret = check_args_and_retrive_filenames(sys.argv[1:])
+        if ret.get("help") == None :
+            print(str(ret["files"])) # debug
+            outputDir = ret["output"] if ret["output"] != None else "./";
+            for file in ret["files"]:
+                extracted_text = parse_file(file)
+                create_text_output(extracted_text,outputDir)
+    except ArgumentException as ex:
+        print("error: "+str(ex))
+        print("use -h or --help for usage"+"\n")
+    # put other exceptions here
+    except Exception as ex:
+        print("unexpected exception: "+str(ex))
