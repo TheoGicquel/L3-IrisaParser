@@ -1,4 +1,6 @@
-import logging
+# @filename title_lib.py
+# @author Theo Gicquel <theo.gicquel.work@gmail.com>
+
 from time import time
 import pdfplumber
 import os
