@@ -40,7 +40,7 @@ def abstract_extractor(parsed):
                 cut = x
                 break
         print(text[abstr:cut])
-        return text[abstr:cut]
+        return text[abstr+8:cut]
 
     
 
