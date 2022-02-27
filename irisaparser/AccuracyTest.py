@@ -10,22 +10,23 @@ import spacy
 import re
 import time
 from datetime import timedelta
-import os.path
+import multiprocessing
+import os
 
-nlp = spacy.load("en_core_web_md")
+from pathlib import Path
+nlp = spacy.load(Path('CustomNER/'))
 
 
 def getExpectedInfoOnPDF(pdfFilePath):
-    # Datas are in JSON file in the same folder BUT with different name ( SPECIFIC TO ISTEX CORPUS )
-    with open(glob.glob(os.path.dirname(pdfFilePath)+"/*.json")[0]) as jsonFile: 
+    # Datas are in JSON file in the same folder BUT with different name
+    with open(glob.glob("/".join(pdfFilePath.split("/")[:-1])+"/*.json")[0]) as jsonFile: 
         return json.load(jsonFile)
-
 
 
 def getAuthors(pdfFilePathTitle,pageNumber=0):
     
     pdfData = pdfplumber.open(pdfFilePathTitle)
-
+    #print(pdfData.metadata)
     if pageNumber==0:
         
         # Some chars are exponent near the name so we have to delete them in order to have correct names
@@ -33,10 +34,17 @@ def getAuthors(pdfFilePathTitle,pageNumber=0):
         numberOfChars = 0        
         
         # Calculate mean of font size in the page
-        for char in pdfData.pages[pageNumber].chars:
-            meanFontSize += char["size"]
-            numberOfChars+=1
-
+        try:
+            for char in pdfData.pages[pageNumber].chars:
+                meanFontSize += char["size"]
+                numberOfChars+=1
+        except TypeError:
+            print("ERR : ",pdfFilePathTitle)
+            return []
+        except ValueError:
+            print("ERR : ",pdfFilePathTitle)
+            return []  
+            
         # Remove exponent chars
         for char in pdfData.pages[pageNumber].chars:
             if char["size"]<(meanFontSize/numberOfChars)-1:
@@ -68,7 +76,7 @@ def getAuthors(pdfFilePathTitle,pageNumber=0):
     lastNamePosition = 0
     
     for ent in doc.ents:
-        if ent.label_ == "PERSON" and (ent.start_char - lastNamePosition <= 60 or lastNamePosition==0):
+        if ent.label_ == "JPP" and (ent.start_char - lastNamePosition <= 60 or lastNamePosition==0):
             lastNamePosition=ent.start_char
             namesFound.append(ent.text.strip().lower())
     
@@ -77,6 +85,7 @@ def getAuthors(pdfFilePathTitle,pageNumber=0):
         return getAuthors(pdfFilePathTitle,1) # Recursive call
 
     return namesFound
+
 
 def getPercentageSimilitudeAuthors(expectedAuthors,extractedAuthors):    
     expectedAuthors = [a for b in expectedAuthors for a in b.split()]
@@ -103,55 +112,71 @@ def getPercentageSimilitudeAbstract(expectedAbstract,extractedAbstract):
 
 
 
-# Variables to store the precision on all PDFs
-globalPrecisionTitle = 0.
-globalPrecisionAuthors = 0.
-globalPrecisionAbstract = 0.
-
-# Number of PDFs treated
-numberOfPDFfiles = 0
-
-# Benchmark time
-start_time = time.time()
-
-# For each PDF file in the current and subsequent directory
-for pdfFile in glob.glob('./**/*.pdf',recursive=True):
+def treatPDF(pdfFile):
     
-    """
-    # Just treat 100 PDFs to tests some changes
-    if numberOfPDFfiles==100:
-        break
-    """
+    #Need to tell this function to use global variables
+    global globalPrecisionTitle
+    global globalPrecisionAuthors
+    global globalPrecisionAbstract
+    global numberOfPDFfiles
     
     # Get expected data (title, authors, abstract, etc ....)
     data = getExpectedInfoOnPDF(pdfFile) 
     
     # In some case, the JSON file doesn't have informations we needed
     if not all (key in data.keys() for key in ("title","author","abstract")):
-        continue # Go to the next pdf 
+        return # Go to the next pdf 
     
     # Calculate the precision between the extraction we made and the expected value
     precisionTitle = getPercentageSimilitudeTitle(data["title"],getTitle(pdfFile))
     precisionAuthors = getPercentageSimilitudeAuthors([author["name"].lower() for author in data["author"]], getAuthors(pdfFile))
     precisionAbstract = getPercentageSimilitudeAbstract(data["abstract"],getAbstract(pdfFile))
     
-    
+    """
     print("[+] "+ pdfFile)
     print("\t Title : " + str(precisionTitle) +" %")
     print("\t Authors : "+ str(precisionAuthors) +" %")    
     print("\t Abstract : "+ str(precisionAbstract) +" %\n")
-    
+    """
+
     # Add this precision to the global precision
-    globalPrecisionTitle+=precisionTitle
-    globalPrecisionAuthors+=precisionAuthors
-    globalPrecisionAbstract+=precisionAbstract
+    globalPrecisionTitle.value+=precisionTitle
+    globalPrecisionAuthors.value+=precisionAuthors
+    globalPrecisionAbstract.value+=precisionAbstract
     
-    numberOfPDFfiles+=1
-    
-if numberOfPDFfiles>0:    
+    numberOfPDFfiles.value+=1
+
+
+# Variables to store the precision on all PDFs.
+# Using some IPC(Inter-Process Communication) in order 
+# to share the variable in the different processes that will be created 
+globalPrecisionTitle = multiprocessing.Value("d",0)
+globalPrecisionAuthors = multiprocessing.Value("d",0)
+globalPrecisionAbstract = multiprocessing.Value("d",0)
+
+# Number of PDFs treated 
+numberOfPDFfiles = multiprocessing.Value("i",0)
+
+# Benchmark time
+start_time= time.time()
+
+# Get all PDFs path
+allPDFs = glob.glob('ISTEX_Corpus/**/*.pdf')
+
+# Prepare a pool of cpu_count() process
+pool = multiprocessing.Pool(multiprocessing.cpu_count())
+
+
+for pdfFile in allPDFs:
+    pool.apply_async(func=treatPDF, args=(pdfFile,)) # Adds the task to the queue. It will be processed when 1 of the cpu_count() processes in the pool is available
+
+pool.close() # No more task to entry in the pool
+pool.join() # Before continuing, wait until all tasks are completed
+
+if numberOfPDFfiles.value>0:    
     print("-"*60)
-    print("\n[+] Total (on " + str(numberOfPDFfiles) + " files in " + str(timedelta(seconds=(time.time() - start_time))) + ") :")
-    print("\t Title : " + str(globalPrecisionTitle / numberOfPDFfiles) + " %")
-    print("\t Authors : " + str(globalPrecisionAuthors / numberOfPDFfiles) + " %")
-    print("\t Abstract : " + str(globalPrecisionAbstract / numberOfPDFfiles) + " %\n")
+    print("\n[+] Total (on " + str(numberOfPDFfiles.value) + " files in " + str(timedelta(seconds=(time.time() - start_time))) + ") :")
+    print("\t Title : " + str(globalPrecisionTitle.value / numberOfPDFfiles.value) + " %")
+    print("\t Authors : " + str(globalPrecisionAuthors.value / numberOfPDFfiles.value) + " %")
+    print("\t Abstract : " + str(globalPrecisionAbstract.value / numberOfPDFfiles.value) + " %\n")
     print("-"*60)
