@@ -1,8 +1,8 @@
 import spacy
 import re
-from pathlib import Path
+import pathlib
 # import pdfplumber
-nlp = spacy.load(Path('CustomNER/'))
+nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
 
 
 def getAuthors(pdfData,pageNumber=0):
