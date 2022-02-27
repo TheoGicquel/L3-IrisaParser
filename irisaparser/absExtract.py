@@ -1,15 +1,3 @@
-import os
-from tika import parser 
-
-
-corpusPath = "../../test/Corpus_2021"
-
-output_file = open("output.txt", "wb")
-
-file = os.path.join(corpusPath,"Nasr.pdf")
-
-parsed = parser.from_file(file)  
-
 def abstract_extractor(parsed):
     abstr = parsed["content"].upper().find('ABSTRACT')
     intro = parsed["content"].upper().find('INTRODUCTION')
