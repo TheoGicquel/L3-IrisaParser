@@ -2,6 +2,7 @@ import sys
 import os
 import traceback
 import title_lib
+import authors_lib
 import abstract_lib
 import pdfplumber
 from tika import parser as tikaParser
@@ -133,8 +134,8 @@ def extractFileName(input):
 def extractTitle(pdf:pdfplumber.PDF):
     return title_lib.parse_title(pdf)
 
-def extractAuthors(input):
-    return ["not found"]
+def extractAuthors(pdf:pdfplumber.PDF):
+    return authors_lib.getAuthors(pdf)
 
 def extractAbstract(tikaInput):
     extracted_abstract = abstract_lib.abstract_extractor(tikaInput)
@@ -148,24 +149,22 @@ def parse_file(filename):
     ret = {}
     ret["fileName"] = os.path.basename(filename)
     ret["title"] = extractTitle(pdf_parsed_by_plumber)
-    ret["authors"] = extractAuthors(None)
+    ret["authors"] = extractAuthors(pdf_parsed_by_plumber)
     ret["abstract"] = extractAbstract(pdf_parsed_by_tika)
     return ret
 
 def create_text_output(extracted_text,outPutPath):
 
     authorsStr = "auteurs: "
-
-    if len(extracted_text["authors"]) > 1 :
-        authorsStr += "\n"
-        for author in extracted_text["authors"]:
-            authorsStr += author+"\n"
+    
+    if extracted_text["authors"] :
+        authorsStr += ", ".join(extracted_text["authors"])
     else:
-        authorsStr += extracted_text["authors"][0]+"\n"
+        authorsStr += "not found"
 
     output_text = "fichier source: "+extracted_text["fileName"]+"\n\n"
     output_text += "titre: "+extracted_text["title"]+"\n\n"
-    output_text += authorsStr+"\n"
+    output_text += authorsStr+"\n\n"
     output_text += "abstract: \n"+extracted_text["abstract"]+"\n"
 
     outFileName = extracted_text["fileName"]+"_extracted.txt"

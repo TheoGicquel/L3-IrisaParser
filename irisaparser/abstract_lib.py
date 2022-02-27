@@ -21,7 +21,5 @@ def abstract_extractor(parsed):
             if text[x] == "\n" and text[x-1] == "\n":
                 cut = x
                 break
-        
-        for index,t in enumerate(text[abstr+8:cut].split("\n\n")): print("index: "+str(index)+"\n"+t)
 
         return text[abstr+8:cut].split("\n\n")[0]
