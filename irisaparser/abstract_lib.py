@@ -1,9 +1,10 @@
+from posixpath import abspath
+
+
 def abstract_extractor(parsed):
     abstr = parsed["content"].upper().find('ABSTRACT')
     intro = parsed["content"].upper().find('INTRODUCTION')
-
-    print(abstr)
-    print(intro)
+    end = len(parsed["content"])
 
     text = parsed["content"]
 
@@ -22,4 +23,4 @@ def abstract_extractor(parsed):
                 cut = x
                 break
 
-        return text[abstr+8:cut].split("\n\n")[0]
+        return text[abstr+8:cut] if end-intro > 6000 else text[abstr+8:cut].split("\n\n")[0]
