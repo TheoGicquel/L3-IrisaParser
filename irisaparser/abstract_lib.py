@@ -2,18 +2,16 @@ def abstract_extractor(parsed):
     abstr = parsed["content"].upper().find('ABSTRACT')
     intro = parsed["content"].upper().find('INTRODUCTION')
 
-    # print(intro)
-    # print(abstr)
+    print(abstr)
+    print(intro)
 
     text = parsed["content"]
 
-    # print(text)
-
-    if abstr == -1:
+    if abstr == -1: # abstract not found
         splited_text = text[:intro].split("\n\n")
 
         for x in splited_text:
-            if len(x) > 150:
+            if len(x) > 200:
                 return x
         return "error"
 
@@ -23,11 +21,7 @@ def abstract_extractor(parsed):
             if text[x] == "\n" and text[x-1] == "\n":
                 cut = x
                 break
-        print(text[abstr:cut])
-        return text[abstr+8:cut]
+        
+        for index,t in enumerate(text[abstr+8:cut].split("\n\n")): print("index: "+str(index)+"\n"+t)
 
-    
-
-output_file.write(abstract_extractor(parsed).encode())
-
-output_file.close()
+        return text[abstr+8:cut].split("\n\n")[0]

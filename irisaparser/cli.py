@@ -2,7 +2,9 @@ import sys
 import os
 import traceback
 import title_lib
+import abstract_lib
 import pdfplumber
+from tika import parser as tikaParser
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -134,20 +136,20 @@ def extractTitle(pdf:pdfplumber.PDF):
 def extractAuthors(input):
     return ["not found"]
 
-def extractAbstract(input):
-    return "not found"
+def extractAbstract(tikaInput):
+    extracted_abstract = abstract_lib.abstract_extractor(tikaInput)
+    return (extracted_abstract if extracted_abstract != "error" else "not found")
 
 def parse_file(filename):
+    pdf_parsed_by_plumber = pdfplumber.open(filename)
 
-    # TODO pdf work here
-    pdf = pdfplumber.open(filename)
-    # TODO input for extracts here
+    pdf_parsed_by_tika = tikaParser.from_file(filename)
 
     ret = {}
     ret["fileName"] = os.path.basename(filename)
-    ret["title"] = extractTitle(pdf)
+    ret["title"] = extractTitle(pdf_parsed_by_plumber)
     ret["authors"] = extractAuthors(None)
-    ret["abstract"] = extractAbstract(None)
+    ret["abstract"] = extractAbstract(pdf_parsed_by_tika)
     return ret
 
 def create_text_output(extracted_text,outPutPath):
@@ -184,6 +186,8 @@ if __name__ == "__main__":
                 try:
                     extracted_text = parse_file(file)
                     create_text_output(extracted_text,outputDir)
+                except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
+                    print("file: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
                     print(" unexpected unicode error: ",end="")
                     print(traceback.format_exc())
