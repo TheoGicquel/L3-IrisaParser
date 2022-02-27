@@ -1,7 +1,9 @@
 import pdfplumber
 import spacy
 import re
-nlp = spacy.load("en_core_web_md")
+from pathlib import Path
+
+nlp = spacy.load(Path('CustomNER/'))
 
 
 def getAuthors(pdfFilePathTitle,pageNumber=0):
@@ -57,7 +59,7 @@ def getAuthors(pdfFilePathTitle,pageNumber=0):
     lastNamePosition = 0
     
     for ent in doc.ents:
-        if ent.label_ == "PERSON" and (ent.start_char - lastNamePosition <= 60 or lastNamePosition==0):
+        if ent.label_ == "JPP" and (ent.start_char - lastNamePosition <= 60 or lastNamePosition==0):
             lastNamePosition=ent.start_char
             namesFound.append(ent.text.strip())
     
@@ -67,5 +69,6 @@ def getAuthors(pdfFilePathTitle,pageNumber=0):
 
     return namesFound
 
-# Example of use 
-# getAuthors("FastIstex/000C52CF9DB5E013451CA07E09722343A80A3ABB/JCAL.JCAL341.pdf")
+# Example of use
+if __name__ == "__main__":
+    print(getAuthors("Das_Martins.pdf"))
