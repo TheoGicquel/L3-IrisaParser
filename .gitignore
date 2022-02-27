@@ -161,3 +161,7 @@ tests/corpus_large/*
 tests/corpus_istex/*
 tests/single/*
 tests/single_extracted/*
+
+# ignore out directory
+
+.out
