@@ -6,9 +6,9 @@ from pathlib import Path
 nlp = spacy.load(Path('CustomNER/'))
 
 
-def getAuthors(pdfFilePathTitle,pageNumber=0):
+def getAuthors(pdfData,pageNumber=0):
     
-    pdfData = pdfplumber.open(pdfFilePathTitle)
+    #pdfData = pdfplumber.open(pdfFilePathTitle)
     #print(pdfData.metadata)
     if pageNumber==0:
         
