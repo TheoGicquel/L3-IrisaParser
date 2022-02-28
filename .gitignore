@@ -157,3 +157,11 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+tests/corpus_large/*
+tests/corpus_istex/*
+tests/single/*
+tests/single_extracted/*
+
+# ignore out directory
+
+.out
