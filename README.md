@@ -41,23 +41,21 @@ pip install pdfplumber tika spacy colorama
 
 ## Usage
 
-Make sure to be in the `/irisaparser` folder (at the same level of `cli.py` file).
-
 To parse a pdf file use the command:
 
 ```sh
-python3 ./cli.py <args>
+python3 ./irisaparser/cli.py <args>
 ```
 For example to parse a file named `f1.pdf` located in `/home/user/pdfs/` and to output results in `/tmp`, use:
 
 ```sh
-python3 ./cli.py /home/user/pdfs/f1.pdf -o /tmp
+python3 ./irisaparser/cli.py /home/user/pdfs/f1.pdf -o /tmp
 ```
 
 To parse all the files located in `/home/user/pdfs`, use:
 
 ```sh
-python3 ./cli.py -d /home/user/pdfs
+python3 ./irisaparser/cli.py -d /home/user/pdfs
 ```
 
 Note that if no output directory is provided using `-o`, text files will be placed **in current directory**.
@@ -65,5 +63,5 @@ Note that if no output directory is provided using `-o`, text files will be plac
 For more information about how to use `cli.py` type the following command:
 
 ```sh
-python3 ./cli.py --help
+python3 ./irisaparser/cli.py --help
 ```
