@@ -185,24 +185,25 @@ def create_text_output(extracted_text,outPutPath):
     outFile.write(output_text)
     outFile.close()
 
+def clean_text_for_xml(text):
+    return text.replace("\n"," ")
+
+def get_xml_node(tagname,content):
+    return "<"+tagname+">"+clean_text_for_xml(str(content))+"</"+tagname+">"
+
 def create_xml_output(extracted_text,outPutPath):
 
-    output_text = get_xml_node("preamble",clean_text_for_xml(extracted_text["fileName"]))
-    output_text = get_xml_node("auteur",clean_text_for_xml(", ".join(extracted_text["authors"])))
-    output_text += get_xml_node("titre",clean_text_for_xml(extracted_text["title"]))
-    output_text += get_xml_node("abstract",clean_text_for_xml(extracted_text["abstract"]))
+    output_text = get_xml_node("preamble",extracted_text["fileName"])
+    output_text += get_xml_node("auteur",", ".join(extracted_text["authors"]))
+    output_text += get_xml_node("titre",extracted_text["title"])
+    output_text += get_xml_node("abstract",extracted_text["abstract"])
     output_text = get_xml_node("article",output_text)
+    output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
 
     outFileName = extracted_text["fileName"]+"_extracted.xml"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
-
-def clean_text_for_xml(text):
-    return text.replace("\n"," ")
-
-def get_xml_node(tagname,content):
-    return "<"+tagname+">"+str(content)+"</"+tagname+">"
 
 # list of availables options
 availables_option = ["-h","-d","-o","--help","--directory","--output_directory","-t","--test","-x","--xml"] 
