@@ -1,7 +1,7 @@
 import sys
 import os
 import traceback
-import title_lib
+import title
 import authors_lib
 import abstract_lib
 import pdfplumber
@@ -132,7 +132,7 @@ def extractFileName(input):
     return "not found"
 
 def extractTitle(pdf:pdfplumber.PDF):
-    return title_lib.parse_title(pdf)
+    return title.parse_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
     return authors_lib.getAuthors(pdf)

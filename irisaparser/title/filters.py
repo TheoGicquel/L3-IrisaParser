@@ -11,28 +11,12 @@ def filter_lines(line_list):
         # catching incorrect lines
         if(len(line)<2):
             valid = False
-        
-        
+                
         # final check
         if(valid == True):
             res.append(line)
     # return only first 5 valid lines
     return res[:5]
-
-def crop_first_page(pdf:pdfplumber.PDF,do_crop=False):
-    """Return only first page of pdf"""
-    page = pdf.pages[0]
-    
-    if(do_crop==True):# WARNING : MAY CAUSE BOUNDING BOXES ERROR
-        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : Attemtping to crop page, may cause crash" + Fore.RESET)
-        # cropping parameters    
-        x0 = 0 # top left corner
-        top = 0 # distance from top of page
-        x1 = page.width # top right corner
-        bottom = float(page.height)/3.0 # distance from bottom of page
-        page = page.crop((x0, top, x1, bottom))
-    
-    return page
 
 
 def filter_fonts(fonts):
@@ -46,7 +30,7 @@ def filter_fonts(fonts):
     
 
 def filter_potential_titles(titles):
-    '''Filter invalid titles (too short,too long)'''
+    """Filter invalid titles (too short,too long)"""
     res = []
     
     for title in titles:
@@ -63,7 +47,7 @@ def filter_potential_titles(titles):
     return res
 
 
-def filter_matches(titles):
+def filter_duplicates(titles):
     test = titles
     res = []
     for i in test:
@@ -75,6 +59,7 @@ def filter_matches(titles):
 
 
 def filter_bad_metadata(meta):
+    #!TODO REFACTOR INTO extract.title()
     if(meta==None):
         return None
     if(len(meta.strip())<5):
