@@ -6,6 +6,7 @@ import authors_lib
 import abstract_lib
 import pdfplumber
 from tika import parser as tikaParser
+import xml.dom.minidom
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -180,25 +181,37 @@ def create_text_output(extracted_text,outPutPath):
     output_text += authorsStr+"\n\n"
     output_text += "abstract: \n"+extracted_text["abstract"]+"\n"
 
+    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
+
     outFileName = extracted_text["fileName"]+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
 
+
+# TODO remove this one, xml.dom.minidom.toprettyxml used instead
 def clean_text_for_xml(text):
     return text.replace("\n"," ")
 
 def get_xml_node(tagname,content):
-    return "<"+tagname+">"+clean_text_for_xml(str(content))+"</"+tagname+">"
+    return "<"+tagname+">"+(str(content))+"</"+tagname+">"
 
 def create_xml_output(extracted_text,outPutPath):
 
     output_text = get_xml_node("preamble",extracted_text["fileName"])
-    output_text += get_xml_node("auteur",", ".join(extracted_text["authors"]))
+
+    authors_text = ""
+
+    for author in extracted_text["authors"]:
+        authors_text += get_xml_node("auteur",str(author))
+
+    output_text += get_xml_node("auteurs",authors_text)
     output_text += get_xml_node("titre",extracted_text["title"])
     output_text += get_xml_node("abstract",extracted_text["abstract"])
     output_text = get_xml_node("article",output_text)
     output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
+
+    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
 
     outFileName = extracted_text["fileName"]+"_extracted.xml"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
