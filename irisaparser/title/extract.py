@@ -1,4 +1,3 @@
-from warnings import filters
 import pdfplumber
 from colorama import init,Fore
 debug_prefix = Fore.LIGHTBLACK_EX+ "(title)"
@@ -86,7 +85,17 @@ def title_metadata(pdf:pdfplumber.PDF):
     """"""
     #!TODO INCLUDE FILTERS DIRECTLY INTO FUNCTION
     meta_title=pdf.metadata.get('Title')
-    meta_title=filters.filter_bad_metadata(meta_title)
+    meta_title=meta_title.strip()
+    if(len(meta_title)<5):
+        return None
+
+    invalid_chars=['/','\\','(',')',]
+    
+    for c in meta_title:
+        if c in invalid_chars:
+            return None
+
+
     if(meta_title is None):
         if(title_debug):print(debug_prefix+Fore.RED + "[*]ERROR : NO VALID METADATA FOUND" + Fore.RESET)
         return None
