@@ -2,7 +2,7 @@ import pdfplumber
 from colorama import init,Fore
 debug_prefix = Fore.LIGHTBLACK_EX+ "(title)"
 title_debug = False
-import filters
+import title.filters as filters
 
 def largest_titles(pdf: pdfplumber.PDF,max_sentences,font_list):
     """ return array with x largest sentences in pdf file """
@@ -43,9 +43,9 @@ def largest_fonts(page,font_amount):
     return page_fonts
 
 
-def largest_titles(page,largest_fonts):
+def largest_titles(page,largest_fonts_list):
     sentences = []
-    for font in largest_fonts:
+    for font in largest_fonts_list:
         scan = ''
         for char in page.chars:
             if(round(char.get('size'),4) == font):
@@ -102,3 +102,55 @@ def title_metadata(pdf:pdfplumber.PDF):
     
     return meta_title
     
+
+def best_title(pdf:pdfplumber.PDF):
+    # get Only 1/3 of pdf's first page
+    page = pdf.pages[0]
+    
+    # get text line by line 
+    text = page.extract_text(x_tolerance=3, y_tolerance=3)
+    # store in list
+    lines = text.split('\n')
+    
+    # remove useless lines and keep only first 5 valid lines
+    lines = filters.filter_lines(lines)
+    
+    # fetch only 5 largest fonts in page
+    largest_fonts_list = largest_fonts(pdf,5)
+    
+    # only use fonts above threshold
+    largest_fonts_list = filters.filter_fonts(largest_fonts_list)
+
+    # find in whole page, sequences of text matching largest fonts
+    potential_titles = largest_titles(page,largest_fonts_list)    
+    
+    # filtering ridiculously long or short files and containing some characters
+    potential_titles = filters.filter_potential_titles(potential_titles)
+    
+    matched = parse_potential_titles(lines,potential_titles)
+    
+    # filter duplicates
+    matched = filters.filter_duplicates(matched)
+    final_title = ''
+    ##### FALLBACKS
+    errcount = 0
+    if(len(matched)>1): # more than one title found -> keep largest one
+        errcount = errcount +1
+        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : multiple titles ! selecting [0] by default" + Fore.RESET)
+        final_title = matched[0]
+
+    if(len(matched)==1):
+        final_title = matched[0]
+    
+    if(len(matched)==0): # title not found -> consult metadata -> if not accurate, first line is used
+        if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : NO REGULAR TITLE FOUND ! falling back on metadata" + Fore.RESET)
+        meta_title = title_metadata(pdf)
+        if(meta_title is None):
+            if(title_debug):print(debug_prefix+Fore.BLUE + "[*]WARN : NO TITLE METADATA FOUND ! falling back on first line..." + Fore.RESET)
+            final_title = lines[0]
+        else:
+            final_title = meta_title
+    
+    if(title_debug):print(debug_prefix+Fore.GREEN + '[>]RESULT : "' + Fore.RESET + final_title + Fore.GREEN + '"\n')
+    
+    return final_title
