@@ -128,7 +128,7 @@ def check_args_and_retrive_filenames(args):
     return ret
 
 def extractTitle(pdf:pdfplumber.PDF):
-    return extract.best_title(pdf)
+    return title_lib.get_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
     return authors_lib.getAuthors(pdf)
