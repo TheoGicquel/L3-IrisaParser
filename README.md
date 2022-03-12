@@ -95,7 +95,7 @@ Now you can use this package with the following command everywhere:
 python3 -m irisaparser <args>
 ```
 
-Bow you can also import the package in a python script like that:
+Alos you can import the package in a python script like that:
 ```py
 import irisaparser
 
@@ -106,7 +106,8 @@ irisaparser.parseFile("filename","./out")
 irisaparser.parseFile("filename")
 
 # parse multiple files provided in the list parameter files:
-irisaparser.parseFiles("filenames")
+filesnames = ["file1","file2"]
+irisaparser.parseFiles(filenames)
 
 # do the equivalent of the command line usage, just pass the arguments as a list of strings:
 args = ["-d","./Corpus_2021","-o","./out"]
