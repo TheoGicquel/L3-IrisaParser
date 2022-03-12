@@ -18,7 +18,9 @@ Make sure that Python and Pip are installed on your computer.
  - Java `>7`
 
 
-### Pip packages:
+### Pip packages *(optional)*:
+
+*This step is necessary only if you don't want to build the package yourself, if you don't want to install manually these dependencies, jump to the **Build** section.*
 
 Once all software requirements are satisfied, please make to sure to install the following pip packages :
 To install pipy packages make sure that pip is intalled and use :
@@ -41,7 +43,9 @@ pip install pdfplumber tika spacy colorama
 
 ## Usage
 
-Make sure you are placed above the `irisaparser` directoty, or for more conveniance build the package. *see the **Build** section.*
+*Note that you must have the dependencies of the **Pip package** section to use irisaparser this way, if it's not the case please see the **Build** section or consult the **Pip package** section.*
+
+Make sure you are placed above the `irisaparser` directory, or for more conveniance build the package.
 
 To parse a pdf file use the command:
 
@@ -90,12 +94,14 @@ To install your package, use the following command with the .whl file you just b
 pip install <some .whl file>
 ```
 
-Now you can use this package with the following command everywhere:
+## Package usage
+
+Once you have installed the package, you can use it with the following command everywhere:
 ```sh
 python3 -m irisaparser <args>
 ```
 
-Alos you can import the package in a python script like that:
+Also you can import the package in a python script like that:
 ```py
 import irisaparser
 
