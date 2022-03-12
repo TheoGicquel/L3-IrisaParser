@@ -6,6 +6,10 @@ def parseFile(filename,outputDir='./'):
     extracted_data = cli.parse_file(filename)
     cli.create_text_output(extracted_data,outputDir)
 
+def parseFiles(files,outputDIr='/'):
+    for file in files:
+        parseFile(file)
+
 def parseArgs(args):
     try:
         ret = cli.check_args_and_retrive_filenames(args)

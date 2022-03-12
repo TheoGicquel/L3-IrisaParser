@@ -41,21 +41,24 @@ pip install pdfplumber tika spacy colorama
 
 ## Usage
 
+Make sure you are placed above the `irisaparser` directoty, or for more conveniance build the package. *see the **Build** section.*
+
 To parse a pdf file use the command:
 
 ```sh
-python3 ./irisaparser/cli.py <args>
+python3 -m irisaparser <args>
 ```
+
 For example to parse a file named `f1.pdf` located in `/home/user/pdfs/` and to output results in `/tmp`, use:
 
 ```sh
-python3 ./irisaparser/cli.py /home/user/pdfs/f1.pdf -o /tmp
+python3  -m irisaparser /home/user/pdfs/f1.pdf -o /tmp
 ```
 
 To parse all the files located in `/home/user/pdfs`, use:
 
 ```sh
-python3 ./irisaparser/cli.py -d /home/user/pdfs
+python3  -m irisaparser -d /home/user/pdfs
 ```
 
 Note that if no output directory is provided using `-o`, text files will be placed **in current directory**.
@@ -63,5 +66,50 @@ Note that if no output directory is provided using `-o`, text files will be plac
 For more information about how to use `cli.py` type the following command:
 
 ```sh
-python3 ./irisaparser/cli.py --help
+python3  -m irisaparser --help
+```
+
+## Build
+
+Make sure that you have [**setuptools**](https://pypi.org/project/setuptools/) and [**wheel**](https://pypi.org/project/wheel/) on your system, you can install these depencies with the command:
+
+```sh
+pip install setuptools wheel
+```
+
+To build the package make sure that you are above the `irisaparser` directory and use the following command:
+
+```sh
+python3 setup.py bdist_wheel
+```
+*for more information about this command consult the [documentation](https://wheel.readthedocs.io/en/stable/)*
+
+To install your package, use the following command with the .whl file you just built:
+
+```sh
+pip install <some .whl file>
+```
+
+Now you can use this package with the following command everywhere:
+```sh
+python3 -m irisaparser <args>
+```
+
+Bow you can also import the package in a python script like that:
+```py
+import irisaparser
+
+# parse a file and put the output in the specified directory:
+irisaparser.parseFile("filename","./out")
+
+# parse a file and put the output in the current directory:
+irisaparser.parseFile("filename")
+
+# parse multiple files provided in the list parameter files:
+irisaparser.parseFiles("filenames")
+
+# do the equivalent of the command line usage, just pass the arguments as a list of strings:
+args = ["-d","./Corpus_2021","-o","./out"]
+irisaparser.parseArgs(args)
+
 ```
