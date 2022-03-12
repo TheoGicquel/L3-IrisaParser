@@ -1,13 +1,13 @@
 import pdfplumber
-import title.filters as filters
+import title.filters
 from colorama import Fore
-
+import title.parse
 debug_prefix = Fore.LIGHTBLACK_EX + "(title)"
 title_debug = False
 
 
 def largest_titles(pdf: pdfplumber.PDF, max_sentences, font_list):
-    """return array with x largest sentences in pdf file"""
+    """return array with x largest sentences in pdf file using font list"""
     res = []
     page = pdf.pages[0]
 
@@ -25,7 +25,7 @@ def largest_titles(pdf: pdfplumber.PDF, max_sentences, font_list):
     return res
 
 
-def largest_fonts(page, font_amount):
+def get_largest_fonts_list(page, font_amount):
     """Return array with x largest fonts in page"""
 
     page_fonts = []
@@ -43,7 +43,11 @@ def largest_fonts(page, font_amount):
     return page_fonts
 
 
-def largest_fonts_unused(page, largest_fonts_list):
+def get_largest_sentences(page, largest_fonts_list):
+    """
+    for every large font:
+        get corresponding text in page into line and store it in array
+    """
     sentences = []
     for font in largest_fonts_list:
         scan = ""
@@ -54,92 +58,41 @@ def largest_fonts_unused(page, largest_fonts_list):
     return sentences
 
 
-def parse_potential_titles(lines_input, potential_titles):
-    #!TODO CLEANUP / COMMENT
-    lines = lines_input
-    res = []
-
-    for pot_title in potential_titles:
-        prev = ""
-
-        for line in lines:
-            raw_title = pot_title.replace(" ", "")
-            raw_line = line.replace(" ", "")
-
-            if raw_line == raw_title:
-                res.append(line)
-
-            # try with previous iteration
-            prev_raw = prev.replace(" ", "")
-            concat_prev = prev_raw + raw_line
-
-            if concat_prev == raw_title:
-                res.append((prev + " " + line))
-
-            prev = line
-    return res
-
-
-def title_metadata(pdf: pdfplumber.PDF):
-    """"""
-    #!TODO INCLUDE FILTERS DIRECTLY INTO FUNCTION
-    meta_title = pdf.metadata.get("Title")
-    meta_title = meta_title.strip()
-    if len(meta_title) < 5:
-        return None
-
-    invalid_chars = [
-        "/",
-        "\\",
-        "(",
-        ")",
-    ]
-
-    for c in meta_title:
-        if c in invalid_chars:
-            return None
-
-    if meta_title is None:
-        if title_debug:
-            print(
-                debug_prefix
-                + Fore.RED
-                + "[*]ERROR : NO VALID METADATA FOUND"
-                + Fore.RESET
-            )
-        return None
-
-    return meta_title
 
 
 def best_title(pdf: pdfplumber.PDF):
+    
+    
+    
     # get Only 1/3 of pdf's first page
     page = pdf.pages[0]
 
     # get text line by line
-    text = page.extract_text(x_tolerance=3, y_tolerance=3)
+    raw_text = page.extract_text(x_tolerance=3, y_tolerance=3)
     # store in list
-    lines = text.split("\n")
+    lines = raw_text.split("\n")
 
     # remove useless lines and keep only first 5 valid lines
-    lines = filters.filter_lines(lines)
+    lines = title.filters.filter_lines(lines)
+
 
     # fetch only 5 largest fonts in page
-    largest_fonts_list = largest_fonts(pdf, 5)
+    largest_fonts_list = get_largest_fonts_list(pdf, 5)
 
     # only use fonts above threshold
-    largest_fonts_list = filters.filter_fonts(largest_fonts_list)
+    largest_fonts_list = title.filters.filter_fonts(largest_fonts_list)
 
     # find in whole page, sequences of text matching largest fonts
-    potential_titles = largest_titles(page, largest_fonts_list)
+    potential_titles = get_largest_sentences(page, largest_fonts_list)
 
     # filtering ridiculously long or short files and containing some characters
-    potential_titles = filters.filter_potential_titles(potential_titles)
+    potential_titles = title.filters.filter_potential_titles(potential_titles)
 
-    matched = parse_potential_titles(lines, potential_titles)
+
+    matched = title.parse.parse_potential_titles(lines, potential_titles)
 
     # filter duplicates
-    matched = filters.filter_duplicates(matched)
+    matched = title.filters.filter_duplicates(matched)
     final_title = ""
     ##### FALLBACKS
     errcount = 0
@@ -167,7 +120,7 @@ def best_title(pdf: pdfplumber.PDF):
                 + "[*]WARN : NO REGULAR TITLE FOUND ! falling back on metadata"
                 + Fore.RESET
             )
-        meta_title = title_metadata(pdf)
+        meta_title = title.parse.title_metadata(pdf)
         if meta_title is None:
             if title_debug:
                 print(
