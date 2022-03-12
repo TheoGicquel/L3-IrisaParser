@@ -1,7 +1,7 @@
 import sys
 import os
 import traceback
-import extract
+import title_lib
 import authors_lib
 import abstract_lib
 import pdfplumber
