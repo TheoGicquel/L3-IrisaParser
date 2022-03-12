@@ -1,12 +1,9 @@
-from colorama import Fore
 
-title_debug = False
-
-debug_prefix = Fore.LIGHTBLACK_EX + "(title)"
-
-
-def filter_lines(line_list):
+def get_first_lines(line_list,number_of_lines):
+    """return the 5 first lines, ignore lines shorter than 2 characters"""
     res = []
+    count = 0
+
     for line in line_list:
         valid = True
         # catching incorrect lines
@@ -15,14 +12,16 @@ def filter_lines(line_list):
 
         # final check
         if valid:
+            count+=1
             res.append(line)
+            
+        if count >= number_of_lines: break
     # return only first 5 valid lines
-    return res[:5]
+    return res
 
 
-def filter_fonts(fonts):
+def filter_fonts_by_minsize(fonts,threshold):
     """Return only fonts above threshold"""
-    threshold = 8.0
     res = []
     for font in fonts:
         if font > threshold:
@@ -30,21 +29,18 @@ def filter_fonts(fonts):
     return res
 
 
-def filter_potential_titles(titles):
+def filter_titles_by_length(titles,min=2,max=80):
     """Filter invalid titles (too short,too long)"""
     res = []
 
     for title in titles:
-        valid = True
         char_only = str(title).strip()
-        lenght = len(char_only)
-
-        if lenght < 2 or lenght > 80:
-            valid = False
+        length = len(char_only)
 
         # catch wrong titles
-        if valid:
+        if length > min and length < max:
             res.append(title)
+
     return res
 
 
@@ -55,22 +51,5 @@ def filter_duplicates(titles):
         i = i.strip()  # remove extra spaces at beginning and end
         i = " ".join(i.split())
         res.append(i)
-    res = list(dict.fromkeys(res))
+    res = list(dict.fromkeys(res)) # seems ugly but it's the way ¯\_(ツ)_/¯
     return res
-
-
-def filter_bad_metadata(meta):
-    # TODO Optimize
-    if meta is None:
-        return None
-    if len(meta.strip()) < 5:
-        return None
-    if "/" in meta:
-        return None
-    if "\\" in meta:
-        return None
-    if "(" in meta:
-        return None
-    if ")" in meta:
-        return None
-    return meta

@@ -1,8 +1,7 @@
 import sys
 import os
 import traceback
-import title
-from title import extract
+import extract
 import authors_lib
 import abstract_lib
 import pdfplumber
@@ -128,12 +127,8 @@ def check_args_and_retrive_filenames(args):
 
     return ret
 
-
-def extractFileName(input):
-    return "not found"
-
 def extractTitle(pdf:pdfplumber.PDF):
-    return title.extract.best_title(pdf)
+    return extract.best_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
     return authors_lib.getAuthors(pdf)
