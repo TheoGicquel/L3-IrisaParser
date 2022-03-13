@@ -6,11 +6,6 @@ pdf = []
 
 parsed = parser.from_file('btp709.pdf')
 
-fichier = open("text.txt", "wb")
-
-listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
-
-#print(listPdf)
 
 def reference_extractor(parsed):
     texte = parsed["content"]
@@ -37,17 +32,11 @@ def reference_extractor(parsed):
     for x in split:
         if x.startswith('http') | x.startswith('\t') | x.startswith('\n\t'):
                 x = " "
-        if len(x) > 10:
+        if len(x) > 50:
             if x[0].islower(): #if the first character of a paragraph is not uppercase stick it to the end of the paragraph above
                 finalstr += "\n" + str(x)
-            elif x.find(',') == -1:
-                x = ""
             else :
                 finalstr += "\n\n" + str(x)
+    finalstr = finalstr[2:].split('\n\n')
+    return finalstr
 
-    return finalstr[2:]
-
- 
-fichier.write(reference_extractor(parsed).encode())
-
-fichier.close()
