@@ -1,9 +1,33 @@
 import spacy
 import re
 import pathlib
-# import pdfplumber
+import pdfplumber
 nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
 
+def getMails(text):
+    
+    # Find all mails within the page
+    mailsFound = re.findall(r"[{|(|[[a-zA-Z0-9\.\-+_]+ ?[,;] ?[a-zA-Z0-9\.\-+_]+[}|)|\]]@[a-z0-9\.\-+_]+\.[a-z]+|[a-zA-Z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+",text)
+
+    # For each mail found with the regex
+    for mail in mailsFound:
+        
+        # Sometimes they are formated like this : {certescertes,ok}@univ-ubs.fr | so there are multiple mails
+        if "," in mail or ";" in mail:
+            
+            # Example : modifiedMail = [ "{certescertes,ok}" , "univ-ubs.fr" ]
+            modifiedMail = mail.replace(" ","").split("@")
+            
+            
+            # For each mail separated by "," or ";"
+            for newMail in re.split(r';|,', modifiedMail[0][1:-1]):
+                # Add it to the new list of mail
+                mailsFound.append(newMail + "@" + modifiedMail[-1])
+                
+            # Remove the long mail from the list founded by the regex
+            mailsFound.remove(mail)
+            
+    return mailsFound
 
 def getAuthors(pdfData,pageNumber=0):
     
@@ -68,6 +92,41 @@ def getAuthors(pdfData,pageNumber=0):
 
     return namesFound
 
+
+def getAuthorsInfos(pdfFileName,pageNumber=0):
+    
+    # Dictionnary that will contain name and list of mails corresponding
+    authorsInfos={}
+    
+    pdfData = pdfplumber.open(pdfFileName)
+    currentPageText = pdfData.pages[pageNumber].extract_text(x_tolerance=1.8,y_tolerance=2)
+    
+    # Get all mails
+    mailsFound = getMails(currentPageText)
+    
+    # Get all authors
+    auteurs = getAuthors(pdfData)
+    
+    nothingFound = True
+    for auteur in auteurs:
+        authorsInfos[auteur]=["",]
+        for partsInName in re.split(r'[ -_]',auteur):
+            for mail in mailsFound:
+                if len(partsInName)>=3 and mail.lower().find(partsInName.lower()) != -1:
+                    nothingFound = False
+                    if authorsInfos.get(auteur)[0]!="":
+                        authorsInfos[auteur].append(mail)
+                    else:
+                        authorsInfos[auteur]=[mail,]
+                    mailsFound.remove(mail)
+
+    if pageNumber==0 and nothingFound:
+        return getAuthorsInfos(pdfFileName,1)
+    elif pageNumber==1 and nothingFound:
+        return getAuthorsInfos(pdfFileName,len(pdfData.pages)-1)
+    return authorsInfos
+
+
 # Example of use
 if __name__ == "__main__":
-    print(getAuthors("Das_Martins.pdf"))
+    print(getAuthorsInfos("339946AC27C12253960F8BF99F2C033EC01CB585/jne11_4_046009.pdf"))
