@@ -165,3 +165,7 @@ tests/single_extracted/*
 # ignore out directory
 
 .out
+.trunk
+.flake8
+.isort.cfg
+.markdownlint.yaml
