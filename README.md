@@ -43,6 +43,8 @@ pip install pdfplumber tika spacy colorama
 
 ## Usage
 
+**/!\\ At first usage, the module will download tika java package, this may take a lot of time. /!\\**
+
 *Note that you must have the dependencies of the **Pip package** section to use irisaparser this way, if it's not the case please see the **Build** section or consult the **Pip package** section.*
 
 Make sure you are placed above the `irisaparser` directory, or for more conveniance build the package.
@@ -95,6 +97,8 @@ pip install <some .whl file>
 ```
 
 ## Package usage
+
+**/!\\ At first usage, the module will download tika java package, this may take a lot of time. /!\\**
 
 Once you have installed the package, you can use it with the following command everywhere:
 ```sh
