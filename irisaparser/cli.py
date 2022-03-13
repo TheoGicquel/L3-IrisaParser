@@ -201,17 +201,22 @@ def create_text_output(extracted_text,outPutPath):
     outFile.close()
 
 
-# TODO remove this one, xml.dom.minidom.toprettyxml used instead
 def clean_text_for_xml(text):
-    return text.replace("\n"," ")
+    ret = text.replace("&","&#38;")
+    ret = ret.replace("<","&#60;")
+    ret = ret.replace(">","&#62;")
+    ret = ret.replace("'","&#39;")
+    ret = ret.replace("\"","&#34;")
+    return ret
 
-def get_xml_node(tagname,content):
+def get_xml_node(tagname,content,clean=False):
+    if clean: content = clean_text_for_xml(content)
     return "<"+tagname+">"+(str(content))+"</"+tagname+">"
 
 def create_xml_output(extracted_text,outPutPath):
 
-    output_text = get_xml_node("preamble",extracted_text["fileName"])
-    output_text += get_xml_node("titre",extracted_text["title"])
+    output_text = get_xml_node("preamble",extracted_text["fileName"],True)
+    output_text += get_xml_node("titre",extracted_text["title"],True)
 
     authors_text = ""
 
@@ -219,18 +224,18 @@ def create_xml_output(extracted_text,outPutPath):
         mail_list = extracted_text["authors"][author]
         mail_text = ""
         for mail in mail_list:
-            mail_text += get_xml_node("mail",mail)
+            mail_text += get_xml_node("mail",mail,True)
         mail_text = get_xml_node("mails",mail_text)
-        name_text = get_xml_node("name",author)
+        name_text = get_xml_node("name",author,True)
         authors_text += get_xml_node("auteur",name_text+mail_text)
 
     output_text += get_xml_node("auteurs",authors_text)
-    output_text += get_xml_node("abstract",extracted_text["abstract"])
+    output_text += get_xml_node("abstract",extracted_text["abstract"],True)
 
     refs_text = ""
 
     for ref in extracted_text["references"]:
-        refs_text+= get_xml_node("reference",ref)
+        refs_text+= get_xml_node("reference",ref,True)
 
     output_text += get_xml_node("biblio",refs_text)
 
@@ -238,8 +243,7 @@ def create_xml_output(extracted_text,outPutPath):
     output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
 
     try:
-        tmp_text = output_text.replace("&","&#38;")
-        output_text = (xml.dom.minidom.parseString(tmp_text)).toprettyxml()
+        output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
     except Exception as ex:
         print(" unexpected xml error for file"+extracted_text["fileName"]+": ",end="")
         print(traceback.format_exc())
