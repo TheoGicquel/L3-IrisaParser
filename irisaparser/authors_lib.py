@@ -93,12 +93,11 @@ def getAuthors(pdfData,pageNumber=0):
     return namesFound
 
 
-def getAuthorsInfos(pdfFileName,pageNumber=0):
+def getAuthorsInfos(pdfData,pageNumber=0):
     
     # Dictionnary that will contain name and list of mails corresponding
     authorsInfos={}
-    
-    pdfData = pdfplumber.open(pdfFileName)
+
     currentPageText = pdfData.pages[pageNumber].extract_text(x_tolerance=1.8,y_tolerance=2)
     
     # Get all mails
@@ -121,9 +120,9 @@ def getAuthorsInfos(pdfFileName,pageNumber=0):
                     mailsFound.remove(mail)
 
     if pageNumber==0 and nothingFound:
-        return getAuthorsInfos(pdfFileName,1)
+        return getAuthorsInfos(pdfData,1)
     elif pageNumber==1 and nothingFound:
-        return getAuthorsInfos(pdfFileName,len(pdfData.pages)-1)
+        return getAuthorsInfos(pdfData,len(pdfData.pages)-1)
     return authorsInfos
 
 

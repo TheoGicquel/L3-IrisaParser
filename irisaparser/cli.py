@@ -135,7 +135,7 @@ def extractTitle(pdf:pdfplumber.PDF):
     return title_lib.parse_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
-    return authors_lib.getAuthors(pdf)
+    return authors_lib.getAuthorsInfos(pdf)
 
 def extractAbstract(tikaInput):
     extracted_abstract = abstract_lib.abstract_extractor(tikaInput)
@@ -157,10 +157,17 @@ def create_text_output(extracted_text,outPutPath):
 
     authorsStr = "auteurs: "
     
-    if extracted_text["authors"] :
-        authorsStr += ", ".join(extracted_text["authors"])
-    else:
-        authorsStr += "not found"
+    for key in extracted_text["authors"]:
+        mailList = extracted_text["authors"][key]
+        authorsStr+="\n"+key+" ("
+        if mailList != None:
+            authorsStr+= ", ".join(mailList)
+        else:
+            authorsStr="mail not found"
+        authorsStr+=")"
+
+    if not extracted_text["authors"]:
+        authorsStr+=" not found"
 
     output_text = "fichier source: "+extracted_text["fileName"]+"\n\n"
     output_text += "titre: "+extracted_text["title"]+"\n\n"
