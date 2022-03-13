@@ -1,10 +1,9 @@
 import sys
 import os
 import traceback
-import title_lib
-import authors_lib
-import abstract_lib
-import references_lib
+from .title_lib import *
+from .authors_lib import *
+from .abstract_lib import *
 import pdfplumber
 from tika import parser as tikaParser
 import xml.dom.minidom
@@ -144,13 +143,13 @@ def check_args_and_retrive_filenames(args):
     return ret
 
 def extractTitle(pdf:pdfplumber.PDF):
-    return title_lib.get_title(pdf)
+    return parse_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
-    return authors_lib.getAuthorsInfos(pdf)
+    return getAuthors(pdf)
 
 def extractAbstract(tikaInput):
-    extracted_abstract = abstract_lib.abstract_extractor(tikaInput)
+    extracted_abstract = abstract_extractor(tikaInput)
     return (extracted_abstract if extracted_abstract != "error" else "not found")
 
 def extractReferences(tikaInput):
@@ -258,7 +257,6 @@ if __name__ == "__main__":
     try:
         ret = check_args_and_retrive_filenames(sys.argv[1:])
         if ret.get("help") == None :
-            #print(str(ret["files"])) # debug
             outputDir = ret["output"] if ret.get("output") != None else "./";
             for file in ret["files"]:
                 try:
