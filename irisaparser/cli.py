@@ -8,6 +8,7 @@ import references_lib
 import pdfplumber
 from tika import parser as tikaParser
 import xml.dom.minidom
+from xml.sax.saxutils import escape
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -108,7 +109,7 @@ def check_args_and_retrive_filenames(args):
                 else:
                     ret["output"] = outputDir
 
-        elif current_arg == "-t" or current_arg == "--test":
+        elif current_arg == "-t" or current_arg == "--text":
             text_output = True
         elif current_arg == "-x" or current_arg == "--xml":
             xml_output = True
@@ -193,7 +194,7 @@ def create_text_output(extracted_text,outPutPath):
     for ref in extracted_text["references"]:
         output_text += "\n"+ref+"\n"
 
-    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
+    #output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
 
     outFileName = extracted_text["fileName"]+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
@@ -211,19 +212,39 @@ def get_xml_node(tagname,content):
 def create_xml_output(extracted_text,outPutPath):
 
     output_text = get_xml_node("preamble",extracted_text["fileName"])
+    output_text += get_xml_node("titre",extracted_text["title"])
 
     authors_text = ""
 
     for author in extracted_text["authors"]:
-        authors_text += get_xml_node("auteur",str(author))
+        mail_list = extracted_text["authors"][author]
+        mail_text = ""
+        for mail in mail_list:
+            mail_text += get_xml_node("mail",mail)
+        mail_text = get_xml_node("mails",mail_text)
+        name_text = get_xml_node("name",author)
+        authors_text += get_xml_node("auteur",name_text+mail_text)
 
     output_text += get_xml_node("auteurs",authors_text)
-    output_text += get_xml_node("titre",extracted_text["title"])
     output_text += get_xml_node("abstract",extracted_text["abstract"])
+
+    refs_text = ""
+
+    for ref in extracted_text["references"]:
+        refs_text+= get_xml_node("reference",ref)
+
+    output_text += get_xml_node("biblio",refs_text)
+
     output_text = get_xml_node("article",output_text)
     output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
 
-    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
+    try:
+        tmp_text = output_text.replace("&","&#38;")
+        output_text = (xml.dom.minidom.parseString(tmp_text)).toprettyxml()
+    except Exception as ex:
+        print(" unexpected xml error for file"+extracted_text["fileName"]+": ",end="")
+        print(traceback.format_exc())
+        #print(output_text)
 
     outFileName = extracted_text["fileName"]+"_extracted.xml"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
