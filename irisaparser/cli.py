@@ -4,6 +4,7 @@ import traceback
 import title_lib
 import authors_lib
 import abstract_lib
+import references_lib
 import pdfplumber
 from tika import parser as tikaParser
 # @authors : L.A and K.O
@@ -137,6 +138,9 @@ def extractAbstract(tikaInput):
     extracted_abstract = abstract_lib.abstract_extractor(tikaInput)
     return (extracted_abstract if extracted_abstract != "error" else "not found")
 
+def extractReferences(tikaInput):
+    return references_lib.reference_extractor(tikaInput)
+
 def parse_file(filename):
     pdf_parsed_by_plumber = pdfplumber.open(filename)
 
@@ -147,6 +151,7 @@ def parse_file(filename):
     ret["title"] = extractTitle(pdf_parsed_by_plumber)
     ret["authors"] = extractAuthors(pdf_parsed_by_plumber)
     ret["abstract"] = extractAbstract(pdf_parsed_by_tika)
+    ret["references"] = extractReferences(pdf_parsed_by_tika)
     return ret
 
 def create_text_output(extracted_text,outPutPath):
@@ -168,7 +173,11 @@ def create_text_output(extracted_text,outPutPath):
     output_text = "fichier source: "+extracted_text["fileName"]+"\n\n"
     output_text += "titre: "+extracted_text["title"]+"\n\n"
     output_text += authorsStr+"\n\n"
-    output_text += "abstract: \n"+extracted_text["abstract"]+"\n"
+    output_text += "abstract: \n"+extracted_text["abstract"]+"\n\n"
+    output_text += "references\n"
+
+    for ref in extracted_text["references"]:
+        output_text += "\n"+ref+"\n"
 
     outFileName = extracted_text["fileName"]+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
