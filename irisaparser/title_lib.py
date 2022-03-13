@@ -1,5 +1,5 @@
 import pdfplumber
-import title_filters
+from .title_filters import *
 
 def largest_titles(pdf: pdfplumber.PDF, max_sentences, font_list):
     """return array with x largest sentences in pdf file using font list"""
@@ -115,25 +115,25 @@ def get_title(pdf: pdfplumber.PDF):
     lines = raw_text.split("\n")
 
     # remove useless lines and keep only first 5 valid lines
-    lines = title_filters.get_first_lines(lines,5)
+    lines = get_first_lines(lines,5)
 
     # fetch only 5 largest fonts in page
     largest_fonts_list = get_largest_fonts_list(pdf, 5)
 
     # only use fonts above size threshold
-    largest_fonts_list = title_filters.filter_fonts_by_minsize(largest_fonts_list,8.0)
+    largest_fonts_list = filter_fonts_by_minsize(largest_fonts_list,8.0)
 
     # find in whole page, sequences of text matching largest fonts
     potential_titles = regroup_chars_by_fonts(page, largest_fonts_list)
 
     # filtering ridiculously long or short files and containing some characters
-    potential_titles = title_filters.filter_titles_by_length(potential_titles)
+    potential_titles = filter_titles_by_length(potential_titles)
 
     # try to find titles by comparing extrated lines to titles detected using fonts regrouping
     matched = match_potential_titles(lines, potential_titles)
 
     # filter duplicates
-    matched = title_filters.filter_duplicates(matched)
+    matched = filter_duplicates(matched)
 
     # trying to determine final title:
     final_title = ""

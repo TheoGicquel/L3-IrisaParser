@@ -9,7 +9,8 @@ try:
         for file in ret["files"]:
             try:
                 extracted_text = parse_file(file)
-                create_text_output(extracted_text,outputDir)
+                if ret["text"]: create_text_output(extracted_text,outputDir)
+                if ret["xml"]: create_xml_output(extracted_text,outputDir)
             except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
                 print("file: "+file+" is probably not a pdf, ignored")
             except UnicodeEncodeError as ex:

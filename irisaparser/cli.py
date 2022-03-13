@@ -4,10 +4,10 @@ import traceback
 from .title_lib import *
 from .authors_lib import *
 from .abstract_lib import *
+from .references_lib import *
 import pdfplumber
 from tika import parser as tikaParser
 import xml.dom.minidom
-from xml.sax.saxutils import escape
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -143,17 +143,17 @@ def check_args_and_retrive_filenames(args):
     return ret
 
 def extractTitle(pdf:pdfplumber.PDF):
-    return parse_title(pdf)
+    return get_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
-    return getAuthors(pdf)
+    return getAuthorsInfos(pdf)
 
 def extractAbstract(tikaInput):
     extracted_abstract = abstract_extractor(tikaInput)
     return (extracted_abstract if extracted_abstract != "error" else "not found")
 
 def extractReferences(tikaInput):
-    return references_lib.reference_extractor(tikaInput)
+    return reference_extractor(tikaInput)
 
 def parse_file(filename):
     pdf_parsed_by_plumber = pdfplumber.open(filename)
