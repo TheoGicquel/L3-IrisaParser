@@ -53,7 +53,12 @@ def regroup_chars_by_fonts(page, largest_fonts_list):
 
 def get_title_from_metadata(pdf: pdfplumber.PDF):
     
-    meta_title = pdf.metadata.get("Title").strip()
+    meta_title = pdf.metadata.get("Title")
+    
+    if not meta_title:
+        return None
+
+    meta_title = meta_title.strip()
 
     if len(meta_title) < 5:
         return None
