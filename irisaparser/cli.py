@@ -127,12 +127,8 @@ def check_args_and_retrive_filenames(args):
 
     return ret
 
-
-def extractFileName(input):
-    return "not found"
-
 def extractTitle(pdf:pdfplumber.PDF):
-    return title_lib.parse_title(pdf)
+    return title_lib.get_title(pdf)
 
 def extractAuthors(pdf:pdfplumber.PDF):
     return authors_lib.getAuthorsInfos(pdf)
