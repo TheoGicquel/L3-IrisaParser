@@ -1,12 +1,3 @@
-from tika import parser
-import os
-
-pdf = []
-
-
-parsed = parser.from_file('btp709.pdf')
-
-
 def reference_extractor(parsed):
     texte = parsed["content"]
     texte = texte[1000:]
@@ -30,7 +21,7 @@ def reference_extractor(parsed):
     
 
     for x in split:
-        if x.startswith('http') | x.startswith('\t') | x.startswith('\n\t'):
+        if x.startswith('http') or x.startswith('\t') or x.startswith('\n\t'):
                 x = " "
         if len(x) > 50:
             if x[0].islower(): #if the first character of a paragraph is not uppercase stick it to the end of the paragraph above
