@@ -130,11 +130,3 @@ def getAuthorsInfos(pdfFileName,pageNumber=0):
 # Example of use
 if __name__ == "__main__":
     print(getAuthorsInfos("339946AC27C12253960F8BF99F2C033EC01CB585/jne11_4_046009.pdf"))
-    """
-    import glob
-    allFiles = glob.glob("**/*.pdf")
-    for pdfFileName in allFiles:
-        print("[+] ",pdfFileName)
-        print(getAuthorsInfos(pdfFileName))
-        print()
-    """
