@@ -7,6 +7,7 @@ import abstract_lib
 import references_lib
 import pdfplumber
 from tika import parser as tikaParser
+import xml.dom.minidom
 # @authors : L.A and K.O
 
 # custom Exception for the sake of best practises
@@ -60,6 +61,9 @@ def check_args_and_retrive_filenames(args):
 
     ret = {}
 
+    text_output = False
+    xml_output = False
+
     while(index < argsCount):
         current_arg = args[index]
 
@@ -70,7 +74,9 @@ def check_args_and_retrive_filenames(args):
             Options :\n \
             -h, --help : display this help page\n \
             -d, --directory <directory> : specify a directory whose files will be to parsed, may be passed multiple times\n \
-            -o, --ouput_directory <output directory> : specify a directory where place output files, you should not specify multiples output directories")
+            -o, --ouput_directory <output directory> : specify a directory where place output files, you should not specify multiples output directories\n \
+            -t, --text : specify output as text files (default unless xml is specified)\n \
+            -x, --xml : specify output as xml files")
             return ret
 
         elif current_arg == "-d" or current_arg == "--directory": #directory
@@ -102,6 +108,11 @@ def check_args_and_retrive_filenames(args):
                 else:
                     ret["output"] = outputDir
 
+        elif current_arg == "-t" or current_arg == "--test":
+            text_output = True
+        elif current_arg == "-x" or current_arg == "--xml":
+            xml_output = True
+
         # if not an option then it must be a file
         elif(not current_arg in files):
             files.append(current_arg)
@@ -125,6 +136,9 @@ def check_args_and_retrive_filenames(args):
         raise ArgumentException("no valid file provided")
 
     ret["files"] = files
+
+    ret["text"] = text_output if xml_output else True
+    ret["xml"] = xml_output
 
     return ret
 
@@ -179,13 +193,45 @@ def create_text_output(extracted_text,outPutPath):
     for ref in extracted_text["references"]:
         output_text += "\n"+ref+"\n"
 
+    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
+
     outFileName = extracted_text["fileName"]+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
 
+
+# TODO remove this one, xml.dom.minidom.toprettyxml used instead
+def clean_text_for_xml(text):
+    return text.replace("\n"," ")
+
+def get_xml_node(tagname,content):
+    return "<"+tagname+">"+(str(content))+"</"+tagname+">"
+
+def create_xml_output(extracted_text,outPutPath):
+
+    output_text = get_xml_node("preamble",extracted_text["fileName"])
+
+    authors_text = ""
+
+    for author in extracted_text["authors"]:
+        authors_text += get_xml_node("auteur",str(author))
+
+    output_text += get_xml_node("auteurs",authors_text)
+    output_text += get_xml_node("titre",extracted_text["title"])
+    output_text += get_xml_node("abstract",extracted_text["abstract"])
+    output_text = get_xml_node("article",output_text)
+    output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
+
+    output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
+
+    outFileName = extracted_text["fileName"]+"_extracted.xml"
+    outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
+    outFile.write(output_text)
+    outFile.close()
+
 # list of availables options
-availables_option = ["-h","-d","-o","--help","--directory","--output_directory"] 
+availables_option = ["-h","-d","-o","--help","--directory","--output_directory","-t","--test","-x","--xml"] 
 
 if __name__ == "__main__":
     try:
@@ -196,7 +242,8 @@ if __name__ == "__main__":
             for file in ret["files"]:
                 try:
                     extracted_text = parse_file(file)
-                    create_text_output(extracted_text,outputDir)
+                    if ret["text"]: create_text_output(extracted_text,outputDir)
+                    if ret["xml"]: create_xml_output(extracted_text,outputDir)
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
                     print("file: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
