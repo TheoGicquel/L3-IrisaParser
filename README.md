@@ -108,8 +108,8 @@ import irisaparser
 # parse a file and put the output in the specified directory:
 irisaparser.parseFile("filename","./out")
 
-# parse a file and put the output in the current directory:
-irisaparser.parseFile("filename")
+# parse a file and put the xml output in the current directory:
+irisaparser.parseFile("filename",xml=True)
 
 # parse multiple files provided in the list parameter files:
 filesnames = ["file1","file2"]
