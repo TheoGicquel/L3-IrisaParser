@@ -4,10 +4,12 @@ Python script to parse pdf files into text files.
 
 ## Setup
 
-you can get the latest stable version by cloning the `master` branch of our repository with :
+You can get the latest stable version by cloning the `master` branch of our repository with :
 ```sh
 git clone https://gitlab.com/inf1603/irisaparser.git
 ```
+
+For other version please consult the [release section](https://gitlab.com/inf1603/irisaparser/-/releases) of the repository on gitlab, and download the source archive corresponding to the desired version.
 
 Make sure that Python and Pip are installed on your computer.
 
