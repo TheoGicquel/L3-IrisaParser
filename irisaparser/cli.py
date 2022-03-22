@@ -230,11 +230,6 @@ def check_args_and_retrive_filenames(args):
                     raise ArgumentException("provided output "+outputDir+" not found")
                 elif(not os.path.isdir(outputDir)):
                     raise ArgumentException("provided output "+outputDir+" is not a directory")
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
                 else:
                     ret["output"] = outputDir
 
