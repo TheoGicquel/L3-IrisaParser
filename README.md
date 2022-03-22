@@ -60,21 +60,21 @@ python3 -m irisaparser <args>
 For example to parse a file named `f1.pdf` located in `/home/user/pdfs/` and to output results in `/tmp`, use:
 
 ```sh
-python3  -m irisaparser /home/user/pdfs/f1.pdf -o /tmp
+python3 -m irisaparser /home/user/pdfs/f1.pdf -o /tmp
 ```
 
 To parse all the files located in `/home/user/pdfs`, use:
 
 ```sh
-python3  -m irisaparser -d /home/user/pdfs
+python3 -m irisaparser -d /home/user/pdfs
 ```
 
 Note that if no output directory is provided using `-o`, text files will be placed **in current directory**.
 
-For more information about how to use `cli.py` type the following command:
+For more information about how to use module type the following command:
 
 ```sh
-python3  -m irisaparser --help
+python3 -m irisaparser --help
 ```
 
 ## Build
