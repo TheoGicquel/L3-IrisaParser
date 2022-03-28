@@ -126,3 +126,7 @@ args = ["-d","./Corpus_2021","-o","./out"]
 irisaparser.parseArgs(args)
 
 ```
+
+## Documentation
+
+For more information about the different options and behaviors of the program consult our [documentation](https://gitlab.com/inf1603/irisaparser/-/blob/master/DOC.md) page.

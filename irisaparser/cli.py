@@ -296,6 +296,11 @@ def parse_file(filename):
     return ret
 
 def create_text_output(extracted_text,outPutPath):
+    """
+    Use the extracted_text dict content to create a proper (organised) text representation of the extracted text
+    And write it in a file named "<pdfFileName>_extracted.txt" write the file in the location provided
+    by outPutPath
+    """
 
     authorsStr = "auteurs: "
     
@@ -327,8 +332,12 @@ def create_text_output(extracted_text,outPutPath):
     outFile.write(output_text)
     outFile.close()
 
-
 def clean_text_for_xml(text):
+    """
+    replace problematic characters such as & , < , > , ' , "
+    and some others by their xml entity
+    """
+
     ret = text.replace("&","&#38;")
     ret = ret.replace("<","&#60;")
     ret = ret.replace(">","&#62;")
@@ -337,10 +346,19 @@ def clean_text_for_xml(text):
     return ret
 
 def get_xml_node(tagname,content,clean=False):
+    """
+    insert the content string between an xml tag using tagname.
+    if clean is passed as True: use clean_text_for_xml to clean content
+    """
     if clean: content = clean_text_for_xml(content)
     return "<"+tagname+">"+(str(content))+"</"+tagname+">"
 
 def create_xml_output(extracted_text,outPutPath):
+    """
+    Use the extracted_text dict content to create an xml representation of the extracted text
+    And write it in a file named "<pdfFileName>_extracted.xml" write the file in the location provided
+    by outPutPath
+    """
 
     output_text = get_xml_node("preamble",extracted_text["fileName"],True)
     output_text += get_xml_node("titre",extracted_text["title"],True)
@@ -384,18 +402,16 @@ def create_xml_output(extracted_text,outPutPath):
 # list of availables options
 availables_option = ["-h","-d","-o","--help","--directory","--output_directory","-t","--text","-x","--xml","-s","--select"] 
 
+# execute program with the given args , used in __init__ and __main__
 def execute(args):
     try:
         ret = check_args_and_retrive_filenames(args)
         if ret.get("help") == None :
             outputDir = ret["output"] if ret.get("output") != None else "./";
             files = ret["files"]
-            print(files)
             if ret.get("select") :
                 files = select_files(files)
-                print(files)
 
-            print(files)
             for file in files:
                 try:
                     extracted_text = parse_file(file)
