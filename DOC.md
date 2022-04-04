@@ -29,26 +29,39 @@ Some other need a second argument to be defined such as :
 
 Note that any of these options can be passed at any order in the command argument list. Just be aware that any non-option argument will be interpreted as a filename and that options that need a second argument will use the next passed argument. Non providing an argument after one of these options will cause the program to exit.
 
+### About the selection.
+
+Using the `--select` option, you will have the possibility of filter which files to finnaly parse, in the list you passed to the program using plain arguments or `--directory` option. All of these files will be placed in a numbered list, that you will be abble to filter using these numbers.
+
+For exemple using this command :
+
+```
+python3 -m irisapser fileA fileB fileC --select
+```
+
+
 ## Python script usage
 
 The `irisaparesr` module when imported in a python script using `import` keyword, will expose these functions :
 
-- **`parseFile`** *`filename, [outputDir, text, xml]`* : which parse the specfied file.
+- **`parseFile`** *(`filename, [outputDir, text, xml]`)* : which parse the specfied file.
     - `filename` : relative name of the file to parse as a `string`.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
     - `text` (optional) : indicate if the file to parse will be extracted as a text file. Used as a boolean. Default is `True`.
     - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is False.
 
-*Note that if `text` and `xml` are passed as False, the file will be parsed but no output file will be writed.*
+*Note that if both `text` and `xml` are passed as `False`, the file will be parsed but no output file will be writed.*
 
-- **`parseFiles`** *`files, [outputDir, text, xml]`* : which parse specfied files, using `parseFile` function
+- **`parseFiles`** *(`files, [outputDir, text, xml]`)* : which parse specfied files, using `parseFile` function
 .
     - `files` : A list (or an equivalent `iterable`) of `string` which are names of the files to parse.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
     - `text` (optional) : indicate if the file to parse will be extrextractedaced as a text file. Used as a boolean. Default is `True`.
     - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is False.
 
-*Note that if `text` and `xml` are passed as False, files will be parsed but no output file will be writed.* 
+*Note that if both `text` and `xml` are passed as `False`, files will be parsed but no output file will be writed.* 
 
-- **`parseArgs`**
+- **`parseArgs`** *(`args`)* : allow you to use the module in a script with all the options of the command line.
+    - `args` : a list (or an equivalent `iterable`) of `string` which are arguments, to know more about arguments and avaiblables options check the **Command line usage** section above.
+
 ## Exemples
