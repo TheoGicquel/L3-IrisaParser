@@ -104,6 +104,10 @@ Current selected files:
 [0] fileA
 ```
 
+After selecting files you can type `y` or `yes` to confirm your selection and launch the parsing task, you could also type `c` or `cancel` to cancel the selection and exit the program (yes you could also use `ctrl+C`).
+
+At any point you could type `h` or `help` to print a simple guide on the available options you have.
+
 
 ## Python script usage
 
