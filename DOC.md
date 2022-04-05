@@ -2,6 +2,8 @@
 
 This document describe all the avaiblables options for the python module `irisaparser`.
 
+Jump to the **Example** section at the bottom to see example of typical usages.
+
 ## Command line usage
 
 The default usage using a command is :
@@ -127,7 +129,7 @@ The `irisaparesr` module when imported in a python script using `import` keyword
     - `filename` : relative name of the file to parse as a `string`.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
     - `text` (optional) : indicate if the file to parse will be extracted as a text file. Used as a boolean. Default is `True`.
-    - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is False.
+    - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is `False`.
 
 *Note that if both `text` and `xml` are passed as `False`, the file will be parsed but no output file will be writed.*
 
@@ -136,7 +138,7 @@ The `irisaparesr` module when imported in a python script using `import` keyword
     - `files` : A list (or an equivalent `iterable`) of `string` which are names of the files to parse.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
     - `text` (optional) : indicate if files to parse will be extracted as a text file. Used as a boolean. Default is `True`.
-    - `xml` (optional) : indicate if files to parse will be extracted as a xml file. Used as boolean. Default is False.
+    - `xml` (optional) : indicate if files to parse will be extracted as a xml file. Used as boolean. Default is `False`.
 
 *Note that if both `text` and `xml` are passed as `False`, files will be parsed but no output file will be writed.* 
 
@@ -251,7 +253,7 @@ So here is the final command :
 python3 -m irisaparser ./a.pdf -d ./dir1 -d ./dir2/dir2.1 -d ./dir2/dir2.2 -s -o ./out -t -x
 ```
 
-Now wa can use the command, press enter and it's time to remove the .txt files that we obviously don't want to parse.
+Now we can use the command, press enter and it's time to remove the .txt files that we obviously don't want to parse.
 
 *Refer to the **About selection** section of this help before processing this part of the example for more details about the selection process.*
 
@@ -324,8 +326,61 @@ Here is a tree view of our directory after the execution:
 
 ### Exemple 3
 
+*Note that to use the module in a script you need to build and install it using a build utility, how to build this module as a python package is explained in the [README](https://gitlab.com/inf1603/irisaparser/-/blob/master/README.md) (The `README.md` file in the source).*
+
 - **Parse a file using a python script**
+
+    *The full documentation fo these functions is explained in the **Python script usage** section above*
+
+    For this we use the `parseFile` function exposed by the module, here is a simple script to parse a file named `somepdf.pdf` located in `/tmp` using both output type, txt and xml:
+
+    ```py
+    import irisaparser # import the module
+
+    irisaparesr.parseFile('/tmp.somepdf.pdf',xml=True);
+    # note that txt is passed as True by default
+    ```
 
 - **Parse multiples files using a python script**
 
+    For this you could use any iterable structures of string and pass it to the function `parseFile` but we will make a little utility to recursively parse all files ending by the `.pdf` extension from a directory gived as argument:
+
+    ```py
+    import irisaparser # as usual
+    import os.path # to manipulate filenames and directories
+
+    main_directory = sys.arg[1] # the first argument passed
+
+    files = [] # list of selected files
+
+    def select_files_from_directory(directory): # function for recursivty
+        if os.path.isdir(directory): # to be sure that a directory was passed
+            for file in os.listdir(directory):
+
+                if os.isdir(file):
+                    select_files_from_directory(file) # if we ancounter ta directory we call the function another time
+        ```     elif os.path.splitext(file)[1] == '.pdf':
+                    files.append(file)
+
+    select_files_from_directory(main_directory) # first call to the recursive function
+
+    if files.count > 0: # don't parse empty list
+        irisaparser.parseFiles(files) # place output txt files in current directory
+    ```
+    *There is multiples ways in python to parcour recursively diretories, whe choose this one because it was simple to explain for us*
+
 - **Pass multiples options to the program using a python script**
+
+    This function allow you to use the module like a command line utility in a python script, this word just as the command line does, just pass a `list` (or any `iterable`) of arguments as `string`, here is a simple example:
+
+    Here we parse the file `somefile.pdf` from our current directory and place the xml output in the `/tmp` directory.
+
+    ```py
+    import irisaparser; # as needed
+
+    arguments = ['./somefile.pdf','-o','/tmp','-x'] # arguments list
+
+    irisaparesr.parseArgs(arguments)
+    ```
+    
+    *Note that we don't recommend the usage of the `--select` option in a python script if it's not designed to be used in a terminal, as using this option will require user input to parse files.*
