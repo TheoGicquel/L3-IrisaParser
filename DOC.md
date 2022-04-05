@@ -359,7 +359,7 @@ Here is a tree view of our directory after the execution:
 
                 if os.isdir(file):
                     select_files_from_directory(file) # if we ancounter ta directory we call the function another time
-        ```     elif os.path.splitext(file)[1] == '.pdf':
+                elif os.path.splitext(file)[1] == '.pdf':
                     files.append(file)
 
     select_files_from_directory(main_directory) # first call to the recursive function
