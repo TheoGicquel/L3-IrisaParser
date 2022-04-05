@@ -24,7 +24,7 @@ Make sure that Python and Pip are installed on your computer.
 
 *This step is necessary only if you don't want to build the package yourself, if you don't want to install manually these dependencies, jump to the **Build** section.*
 
-Once all software requirements are satisfied, please make to sure to install the following pip packages :
+Once all software requirements are satisfied, please install the following pip packages :
 To install pipy packages make sure that pip is intalled and use :
 
 ```sh

@@ -130,7 +130,7 @@ def select_files(files):
                 if last_index < first_index:
                     print(""+user_input+" is not valid, last index must be superior or equal to the first index")
                 else:
-                    for step in range(((last_index-first_index)+2)):
+                    for step in range(((last_index-first_index)+1)):
                         if mode == 'exclude': exclude_file(first_index+step)
                         else: include_file(first_index+step)
 
