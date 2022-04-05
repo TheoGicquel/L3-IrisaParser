@@ -29,7 +29,7 @@ Some option just change the behavior of the program and don't need another argum
 - **`-x`** or **`--xml`** : specify the output files format as xml, may be used allong with `--text` for both format. 
 - **`-s`** or **`--select`** : allow you to select which files you want to parse finnaly, after retrieving all files you passed as arguments or using the `--directory` option, this option will allow you to select which files should be extracted at the end, for more information see the **selection** section below.
 
-*Note that option can't be aggregated, unlike many command line interface we don't allow that for exemple : `-tsx` is not a valid option syntax and will be interpreted as a filename.*
+*Note that option can't be aggregated, unlike many command line interface we don't allow that for example : `-tsx` is not a valid option syntax and will be interpreted as a filename.*
 
 Some other need a second argument to be defined such as :
 
@@ -45,7 +45,7 @@ Using the `--select` option, you will have the possibility of filter which files
 
 Note that without passing using the `--select` option, all files will be parsed, without letting you filter them.
 
-For exemple using this command :
+For example using this command :
 
 ```
 python3 -m irisapser fileA fileB fileC --select
@@ -145,11 +145,11 @@ The `irisaparesr` module when imported in a python script using `import` keyword
 - **`parseArgs`** *(`args`)* : allow you to use the module in a script with all the options of the command line.
     - `args` : a list (or an equivalent `iterable`) of `string` which are arguments, to know more about arguments and avaiblables options check the **Command line usage** section above.
 
-## Exemples
+## Examples
 
 There is a list of Examples of typical usage of irisaparser.
 
-### Exemple 1
+### Example 1
 
 Here is a tree view of our files for this example:
 ```
@@ -200,7 +200,7 @@ Here is a tree view of our files for this example:
     └── fileC_extracted.xml
     ```
 
-### Exemple 2
+### Example 2
 
 **Parse multiples files in multiples directories in a specified output directory**
 
@@ -324,7 +324,7 @@ Here is a tree view of our directory after the execution:
     └── 22a._extracted.xml
 ```
 
-### Exemple 3
+### Example 3
 
 *Note that to use the module in a script you need to build and install it using a build utility, how to build this module as a python package is explained in the [README](https://gitlab.com/inf1603/irisaparser/-/blob/master/README.md) (The `README.md` file in the source).*
 
