@@ -129,4 +129,4 @@ irisaparser.parseArgs(args)
 
 ## Documentation
 
-For more information about the different options and behaviors of the program consult our [documentation](https://gitlab.com/inf1603/irisaparser/-/blob/master/DOC.md) page.
+For more information about the different options and behaviors of the program consult our [documentation](https://gitlab.com/inf1603/irisaparser/-/blob/master/DOC.md) page (The `DOC.md` if you downloaded the source code).
