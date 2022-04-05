@@ -12,6 +12,14 @@ python3 -m irisaparser <file> [file...]
 
 Without options a command argument is interpreted as a filename. But the module allow you tu use multiples options to specify the behavior of the program.
 
+The usage using a command with options is :
+
+```sh
+python3 -m irisaparser [[options...] [file...] ...]
+```
+
+You can pass options and files arguments in any order, but some options arguments need to have a second argument just after them, pay attention to these.
+
 Some option just change the behavior of the program and don't need another argument such as :
 
 - **`-h`** or **`--help`** : display the help, if this option is passed, help will be displayed and no other action will be effectued
@@ -32,6 +40,8 @@ Note that any of these options can be passed at any order in the command argumen
 ### About the selection.
 
 Using the `--select` option, you will have the possibility of filter which files to finnaly parse, in the list you passed to the program using plain arguments or `--directory` option. All of these files will be placed in a numbered list, that you will be abble to filter using these numbers.
+
+Note that without passing using the `--select` option, all files will be parsed, without letting you filter them.
 
 For exemple using this command :
 
@@ -125,8 +135,8 @@ The `irisaparesr` module when imported in a python script using `import` keyword
 .
     - `files` : A list (or an equivalent `iterable`) of `string` which are names of the files to parse.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
-    - `text` (optional) : indicate if the file to parse will be extrextractedaced as a text file. Used as a boolean. Default is `True`.
-    - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is False.
+    - `text` (optional) : indicate if files to parse will be extracted as a text file. Used as a boolean. Default is `True`.
+    - `xml` (optional) : indicate if files to parse will be extracted as a xml file. Used as boolean. Default is False.
 
 *Note that if both `text` and `xml` are passed as `False`, files will be parsed but no output file will be writed.* 
 
@@ -134,3 +144,61 @@ The `irisaparesr` module when imported in a python script using `import` keyword
     - `args` : a list (or an equivalent `iterable`) of `string` which are arguments, to know more about arguments and avaiblables options check the **Command line usage** section above.
 
 ## Exemples
+
+There is a list of Examples of typical usage of irisaparser.
+
+### Exemple 1
+
+Here is a tree view of our files for this example:
+```
+├── fileA.pdf
+├── fileB.pdf
+└── fileC.pdf
+```
+
+- **To parse only one file:**
+    ```sh
+    python3 -m irisaparser fileA.pdf
+    ```
+    Here is a tree view of the directory after the execution:
+    ```
+    ├── fileA.pdf
+    ├── fileA_extracted.txt
+    ├── fileB.pdf
+    └── fileC.pdf
+    ```
+
+- **To parse all files as xml**
+
+    Here you have multiples options, you could use the `-d` option to pass your current directory as a directory, or specify all files one by one, or use the power of your terminal to aggregate the files for you using [wildcards](https://en.wikipedia.org/wiki/Glob_(programming)).
+
+    To create output as xml you should add the option `-x` or `--xml`.
+
+    - using `-d` :
+    ```sh
+    python3 -m irisaparser -d ./ -x
+    ```
+
+    - passing all files one by one:
+    ```sh
+    python3 -m irisaparser fileA.pdf fileB.pdf fileC.pdf -x
+    ```
+
+    - using [wildcards](https://en.wikipedia.org/wiki/Glob_(programming)):
+    ```sh
+    python3 -m irisaparser ./* -x
+    ```
+    Here is a tree view of the directory after the execution:
+    ```
+    ├── fileA.pdf
+    ├── fileA_extracted.xml
+    ├── fileB.pdf
+    ├── fileB_extracted.xml
+    ├── fileC.pdf
+    └── fileC_extracted.xml
+    ```
+
+### Exemple 2
+
+
+### Exemple 3
