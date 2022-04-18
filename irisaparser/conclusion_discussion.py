@@ -1,11 +1,11 @@
-
+import pdfplumber
+import re
+# ---------- TEST ONLY (remove before production )---------- #
 if __name__ == "__main__":
-    import pdfplumber as plumb
-    import tika.parser as tp
-   
+    filepath = "./tests/corpus_large/Torres.pdf"
+    pdf = pdfplumber.open(filepath)
+# ---------------------------------------------------------- #
     
-# --------------------------------------------------------- #
-
 # 'Conclusions and Future Work' 'conclusion' 'conclusion and perspectives' 'conclusion and future work' 'Discussion' '  
 # after ACKNOWLEDGEMENT 'ACKNOWLEDGEMENTS' 'REFERENCES' 'APPENDIX *' 'Follow-Up'
 keywords = ['CONCLUSION','RESULT']
@@ -13,111 +13,58 @@ endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLL
 
 
 
-def getConclusionSequences(file):
-    '''find lines with matching keywords and return list of positions'''
-    content = file["content"]
-    keywords_conclusion = ['CONCLUSION','CONCLUSIONS','RESULTS','CONCLUSIONS AND FUTURE WORK','CONCLUSION AND PERSPECTIVES','CONCLUSIONS']
 
-    conclBegPos = None
-    conclEndPos = None
-    sequences = []
-    begSectionPos = []
-    print("begin")
-    for l in keywords_conclusion:
-        conclBegPos = content.upper().find(l)
+def getConclusion(pdf:pdfplumber.PDF):
+    # REMINDER : pdf.chars is a list of dict
+    alltext = []
+    pagesCharNum =[]
+    
+    for p in pdf.pages:
+        pagesCharNum.append(len(p.chars))
 
-       
-        
-        # if((conclBegPos not None) and (conclBegPos not -1)):
-        if(conclBegPos>0):
-            # try to find end of line in next 30 characters 
-            conclEndPos = content[conclBegPos:conclBegPos+35].upper().find('\n')
-           
-            if(conclEndPos>0):
-                 # since array was resized during search, fix indexing
-                conclEndPos+=conclBegPos
-                sequences.append([conclBegPos,conclEndPos])
-                begSectionPos.append(conclEndPos)
-                print('l:',end='')
-                print(l,end='   ')
-                print(conclEndPos)
-                
-        
-    begSectionPos.sort(reverse=True)
-    print("end")
+    
+    conclPos = []
+    
+    
+    for p in pdf.pages:
+        text = p.extract_text(x_tolerance=3, y_tolerance=3)
 
-    endSectionPos = []
-    for l in endKeywords:
-        endsection = content.upper().find(l)
-
-        if(endsection>0):
-            print('l:',end='')
-            print(l,end='   ')
-            print(endsection)
-            endSectionPos.append(endsection)
+        keyword = "CONCLUSION"
+        keywordB = "RESULT"
+        pos = text.upper().find(keyword)
+        if(pos>0):
+            print("found at pos : "+str(pos) + "@p " + str(p.page_number-1))
+            conclPos.append(pos)
+            #conclPos.append(pos+pagesCharNum[p.page_number-1])
+        else:
+            pos = text.upper().find(keywordB)
+            if(pos>0):
+                print("found at pos : "+str(pos) + "@p " + str(p.page_number-1))
+                conclPos.append(pos)
+                #conclPos.append(pos+pagesCharNum[p.page_number-1])
+            
     
-    endSectionPos.sort(reverse=True)
-    print(begSectionPos)
-    
-    print(endSectionPos)
-    
-    print("attempt : ",end='')
-    
-    
-    beginSection = begSectionPos[0]
-    endSection = endSectionPos[0]
-    
-    print("["+ str(beginSection) + "," + str(endSection) + "]")
-
-    print(content[beginSection:endSection])
-    
-                
-    for seq in sequences:
-        pass
-        #print(content[seq[0]:endsection])
-    if(len(sequences)>0):
-        return sequences
-    else:
-        return None
-
-
-
-
-def getConclusion(filePath):
-    # find conclusion begin posistions
-    tikaparsed = tp.from_file(filePath)
-    conclSeq = getConclusionSequences(tikaparsed)
-    return None
-    if(conclSeq is None):
-        return None
-    
-    content = tikaparsed["content"]
-    
-    
-    
-    # test positions with pdfplumber
-    pdf = plumb.open(filePath)
-    
-    plumbedConclLines = []
-    
-    for l in conclSeq:
-        beginC = l[0]
-        endC = l[1]
-        
-        print(l,end="(len:")
-        print(endC-beginC,end=")\n")
-        plumbedConclLines.append(pdf.chars[beginC:endC])
-        
-    for line in plumbedConclLines:
-        for char in line:
+    for pos in conclPos:
+        seq = pdf.chars[pos:pos+30]
+        print("\n--- match --")
+        for char in seq:
             print(char['text'],end='')
-        print("")
+            
 
-    #remainder = remainder.replace('-\n','') # replace newlines for words splits
-    #remainder = remainder
-    #remainder = remainder.split('\n')
-    return None
+    #text = pdf.extract_text(x_tolerance=3, y_tolerance=3)
+    
+        # Remove unecessary chars
+        #text = re.sub("a´","à",text)
+        #text = re.sub("´e","é",text)
+        #text = re.sub("e´","è",text)
+        #text = re.sub("c¸","ç",text)
+        #text = re.sub("ˆı","î",text)
+    
 
-# ---------- DEV ONLY (remove before production )---------- #
-print(getConclusion("./tests/corpus_large/Torres.pdf"))
-# --------------------------------------------------------- #
+
+
+# ---------- TEST ONLY (remove before production )---------- #
+if __name__ == "__main__":
+    res = getConclusion(pdf)
+    print(res)
+# ---------------------------------------------------------- #
