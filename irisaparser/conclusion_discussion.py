@@ -1,70 +1,45 @@
-import pdfplumber
+from turtle import pos
+from pyparsing import line
+from tika import parser as tp
 import re
 # ---------- TEST ONLY (remove before production )---------- #
 if __name__ == "__main__":
     filepath = "./tests/corpus_large/Torres.pdf"
-    pdf = pdfplumber.open(filepath)
+    parsed = tp.from_file(filepath)
 # ---------------------------------------------------------- #
     
 # 'Conclusions and Future Work' 'conclusion' 'conclusion and perspectives' 'conclusion and future work' 'Discussion' '  
 # after ACKNOWLEDGEMENT 'ACKNOWLEDGEMENTS' 'REFERENCES' 'APPENDIX *' 'Follow-Up'
-keywords = ['CONCLUSION','RESULT']
 endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
 
 
-
-
-def getConclusion(pdf:pdfplumber.PDF):
-    # REMINDER : pdf.chars is a list of dict
-    alltext = []
-    pagesCharNum =[]
+def getConclusion(parsed):
+    keywords = ['CONCLUSION','RESULT']
+    content = parsed["content"]
+    res = []
+    resultText = []
+    lines = content.split('\n\n') # hopefully separate paragraphs
     
-    for p in pdf.pages:
-        pagesCharNum.append(len(p.chars))
-
+    for k in keywords:
+        # manage priorities of keywords (i.e Conclusion > Result)
+        if(len(res)>0):
+            break
+        for index,l in enumerate(lines):
+            posConc = l[0:15].upper().find(k)
+            if(posConc > -1):
+                print("found :'"+l+"' at pos:" + str(index) )
+                res.append(index+1) # we assume next paragraph is conclusion body
     
-    conclPos = []
+    
+    lastMatch = res[-1] # use farthest match in document
+    print(lastMatch)
+    conclusionBody=lines[lastMatch]
+    print(conclusionBody)
     
     
-    for p in pdf.pages:
-        text = p.extract_text(x_tolerance=3, y_tolerance=3)
-
-        keyword = "CONCLUSION"
-        keywordB = "RESULT"
-        pos = text.upper().find(keyword)
-        if(pos>0):
-            print("found at pos : "+str(pos) + "@p " + str(p.page_number-1))
-            conclPos.append(pos)
-            #conclPos.append(pos+pagesCharNum[p.page_number-1])
-        else:
-            pos = text.upper().find(keywordB)
-            if(pos>0):
-                print("found at pos : "+str(pos) + "@p " + str(p.page_number-1))
-                conclPos.append(pos)
-                #conclPos.append(pos+pagesCharNum[p.page_number-1])
-            
-    
-    for pos in conclPos:
-        seq = pdf.chars[pos:pos+30]
-        print("\n--- match --")
-        for char in seq:
-            print(char['text'],end='')
-            
-
-    #text = pdf.extract_text(x_tolerance=3, y_tolerance=3)
-    
-        # Remove unecessary chars
-        #text = re.sub("a´","à",text)
-        #text = re.sub("´e","é",text)
-        #text = re.sub("e´","è",text)
-        #text = re.sub("c¸","ç",text)
-        #text = re.sub("ˆı","î",text)
-    
-
 
 
 # ---------- TEST ONLY (remove before production )---------- #
 if __name__ == "__main__":
-    res = getConclusion(pdf)
-    print(res)
+    res = getConclusion(parsed)
 # ---------------------------------------------------------- #
