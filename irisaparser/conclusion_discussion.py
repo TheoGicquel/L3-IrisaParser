@@ -7,10 +7,14 @@ if __name__ == "__main__":
     
 # 'Conclusions and Future Work' 'conclusion' 'conclusion and perspectives' 'conclusion and future work' 'Discussion' '  
 # after ACKNOWLEDGEMENT 'ACKNOWLEDGEMENTS' 'REFERENCES' 'APPENDIX *' 'Follow-Up'
+
+# enable to print debug info to stdout
 debug = False
 def dprint(input):
     if(debug):
         print(input)
+
+
 
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
@@ -18,7 +22,6 @@ def getConclusion(parsed):
     content = parsed["content"]
     resBegin = []
     resEnd = []
-    resultText = []
     lines = content.split('\n\n') # hopefully separate paragraphs
     
     for k in beginKeywords:
@@ -47,16 +50,35 @@ def getConclusion(parsed):
     
     dprint("result: begin at line [" + str(BeginArea) + '] ends at [' + str(EndArea) + "]")
     endArray = lines[BeginArea:EndArea]
+    
+    # append all lines into single string
     final = ''
     for l in endArray:
         final = f'{final}{l}'
     return final
     
+def getDiscussion(parsed):
+    content = parsed["content"]
+    posDisc= []
+    lines = content.split('\n\n') # hopefully separate paragraphs
     
+    for index,l in enumerate(lines):
+            pos = l[0:15].upper().find('DISCUSSION')
+            if(pos > -1):
+                dprint("found :'"+l+"' at pos:" + str(index) )
+                posDisc.append(index+1) # we assume next paragraph is discussion body
+
+    if(len(posDisc)>0):    
+        discusArea = posDisc[-1] # use farthest match in document
+        return lines[discusArea]
+    else:
+        return None
 
 
 # ---------- TEST ONLY (remove before production )---------- #
 if __name__ == "__main__":
-    res = getConclusion(parsed)
-    print(res)
+    concl = getConclusion(parsed)
+    #print(concl)
+    discussion = getDiscussion(parsed)
+    print(discussion)
 # ---------------------------------------------------------- #
