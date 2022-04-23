@@ -5,14 +5,6 @@ if __name__ == "__main__":
     parsed = tp.from_file(filepath)
 # ---------------------------------------------------------- #
     
-# 'Conclusions and Future Work' 'conclusion' 'conclusion and perspectives' 'conclusion and future work' 'Discussion' '  
-# after ACKNOWLEDGEMENT 'ACKNOWLEDGEMENTS' 'REFERENCES' 'APPENDIX *' 'Follow-Up'
-
-# enable to print debug info to stdout
-debug = True
-def dprint(input):
-    if(debug):
-        print(input)
 
 NOT_FOUND_MSG = "NOT FOUND"
 
@@ -31,7 +23,6 @@ def getConclusion(parsed):
         for index,l in enumerate(lines):
             posConc = l[0:15].upper().find(k)
             if(posConc > -1):
-                dprint("found :'"+l+"' at pos:" + str(index) )
                 resBegin.append(index+1) # we assume next paragraph is conclusion body
     
     if(len(resBegin)==0):
@@ -44,14 +35,9 @@ def getConclusion(parsed):
         for index,l in enumerate(lines):
             posNextParagraph = l[0:15].upper().find(k)
             if(posNextParagraph > -1):
-                dprint("found :'"+l+"' at pos:" + str(index) )
                 resEnd.append(index) # we assume next paragraph is conclusion body
     EndArea = resEnd[-1]
-    dprint("--- endarea----")
-    dprint(lines[EndArea])
-    dprint("---------------")
     
-    dprint("result: begin at line [" + str(BeginArea) + '] ends at [' + str(EndArea) + "]")
     endArray = lines[BeginArea:EndArea]
     
     # append all lines into single string
@@ -67,8 +53,7 @@ def getDiscussion(parsed):
     
     for index,l in enumerate(lines):
             pos = l[0:15].upper().find('DISCUSSION')
-            if(pos > -1):
-                dprint("found :'"+l+"' at pos:" + str(index) )
+            if(pos > -1):              
                 posDisc.append(index+1) # we assume next paragraph is discussion body
 
     if(len(posDisc)>0):    
