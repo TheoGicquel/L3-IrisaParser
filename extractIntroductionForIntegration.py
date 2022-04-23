@@ -1,15 +1,8 @@
-from tika import parser  
+# from tika import parser  
+# import os
+# import re
 
-import os
-import re
 
-pdf = []
-
-parsed = parser.from_file("./PDF/Torres.pdf")
-
-fichier = open("./TXTTest/Torres.txt", "wb")
-
-listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
 
 def intro_extractor(parsed):
 
@@ -45,9 +38,7 @@ def intro_extractor(parsed):
 
 
 
-fichier.write(intro_extractor(parsed).encode())
 
-fichier.close()
 
 
 
