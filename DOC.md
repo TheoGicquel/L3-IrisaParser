@@ -1,18 +1,18 @@
 # Irisa Parser Documentation
 
-This document describe all the avaiblables options for the python module `irisaparser`.
+This document describes all avaiblable options for the python module `irisaparser`.
 
-Jump to the **Example** section at the bottom to see example of typical usages.
+Jump to the **Example** section at the bottom to see typical usage examples.
 
 ## Command line usage
 
-The default usage using a command is :
+The default usage of a command is :
 
 ```sh
 python3 -m irisaparser <file> [file...]
 ```
 
-Without options a command argument is interpreted as a filename. But the module allow you tu use multiples options to specify the behavior of the program.
+Without options, a command argument is interpreted as a filename. But the module allows you to use multiple options to specify program behavior.
 
 The usage using a command with options is :
 
@@ -20,16 +20,16 @@ The usage using a command with options is :
 python3 -m irisaparser [[options...] [file...] ...]
 ```
 
-You can pass options and files arguments in any order, but some options arguments need to have a second argument just after them, pay attention to these.
+You can pass options and files arguments in any order, but some options arguments require a second argument right after them, pay close attention to these.
 
-Some option just change the behavior of the program and don't need another argument such as :
+Some options just change the behavior of the program and don't need further arguments, for instance :
 
-- **`-h`** or **`--help`** : display the help, if this option is passed, help will be displayed and no other action will be effectued
-- **`-t`** or **`--text`** : specify the output files format as text (default if `--xml` not specified), may be used allong with `--xml` for both format. 
-- **`-x`** or **`--xml`** : specify the output files format as xml, may be used allong with `--text` for both format. 
-- **`-s`** or **`--select`** : allow you to select which files you want to parse finnaly, after retrieving all files you passed as arguments or using the `--directory` option, this option will allow you to select which files should be extracted at the end, for more information see the **selection** section below.
+- **`-h`** or **`--help`** : displays the help, if this option is passed, help will be displayed and no other action will be performed
+- **`-t`** or **`--text`** : specify the output files format as text (enabled by default if `--xml` is not specified), may be used along with `--xml` to obtain both formats. 
+- **`-x`** or **`--xml`** : specify the output files format as xml, may be used along with `--text` to obtain both format. 
+- **`-s`** or **`--select`** : allows you to select which files you want to parse finally, after retrieving all files that have been passed as arguments or using the `--directory` option, this option will allow you to select which files should be extracted at the end, for more information see the **selection** section below.
 
-*Note that option can't be aggregated, unlike many command line interface we don't allow that for example : `-tsx` is not a valid option syntax and will be interpreted as a filename.*
+*Please note that options cannot be aggregated, unlike many command line interfaces we don't allow that, for example : `-tsx` is not a valid option syntax and will instead be interpreted as a filename.*
 
 Some other need a second argument to be defined such as :
 
@@ -37,11 +37,11 @@ Some other need a second argument to be defined such as :
 
 - **`-o`** or **`--output-directory`** `<directorypath>` : this option allow you to specify a directory where the created files will be placed, without this option the program will place these files in the current directory. **This option cannot be specified multiples times
 
-Note that any of these options can be passed at any order in the command argument list. Just be aware that any non-option argument will be interpreted as a filename and that options that need a second argument will use the next passed argument. Non providing an argument after one of these options will cause the program to exit.
+Note that any of these options can be passed at any order in the command argument list. Just be aware that any non-option argument will be interpreted as a filename and that options that need a second argument will use the next passed argument. Not providing an argument after one of these options will cause the program to exit.
 
 ### About the selection.
 
-Using the `--select` option, you will have the possibility of filter which files to finnaly parse, in the list you passed to the program using plain arguments or `--directory` option. All of these files will be placed in a numbered list, that you will be abble to filter using these numbers.
+Using the `--select` option, you will have the possibility of filter which files to finally parse, in the list you passed to the program using plain arguments or `--directory` option. All of these files will be placed in a numbered list, that you will be abble to filter using these numbers.
 
 Note that without passing using the `--select` option, all files will be parsed, without letting you filter them.
 
@@ -53,7 +53,7 @@ python3 -m irisapser fileA fileB fileC --select
 
 This will allow you to select files to parses in the list you specified using command arguments.
 
-In this part we will consider two lists, the **specified list** who contains all the files specified using command arguments, and the **selected list** who contains all the file you want to be parsed.
+In this part we will consider two lists, the **specified list** which contains all files specified using command arguments, and the **selected list** which contains all files you want to be parsed.
 
 First you will be asked to choose a selection mode, there is two selection modes:
 
@@ -71,7 +71,7 @@ After selecting a mode the **specified list** will be printed with an index for 
 [2] fileC
 ```
 
-Using `exclude` mode: all three files will be selected and you could removes some from the **selected list**, using `include` mode: no files will be selected and you will have to selec files to be parsed.
+Using `exclude` mode: all three files will be selected and you could removes some from the **selected list**, using `include` mode: no files will be selected and you will have to select files to be parsed.
 
 You add or remove files using their index or a range of an inclusive range of index:
 
@@ -123,13 +123,13 @@ At any point you could type `h` or `help` to print a simple guide on the availab
 
 ## Python script usage
 
-The `irisaparesr` module when imported in a python script using `import` keyword, will expose these functions :
+The `irisaparesr` module when imported in a python script using `import` keyword, will expose the following functions :
 
-- **`parseFile`** *(`filename, [outputDir, text, xml]`)* : which parse the specfied file.
+- **`parseFile`** *(`filename, [outputDir, text, xml]`)* : which parses the specfied file.
     - `filename` : relative name of the file to parse as a `string`.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
-    - `text` (optional) : indicate if the file to parse will be extracted as a text file. Used as a boolean. Default is `True`.
-    - `xml` (optional) : indicate if the file to parse will be extracted as a xml file. Used as boolean. Default is `False`.
+    - `text` (optional) : indicates if the file to parse will be extracted as a text file. Used as a boolean. Default is `True`.
+    - `xml` (optional) : indicates if the file to parse will be extracted as a xml file. Used as boolean. Default is `False`.
 
 *Note that if both `text` and `xml` are passed as `False`, the file will be parsed but no output file will be writed.*
 
@@ -137,12 +137,12 @@ The `irisaparesr` module when imported in a python script using `import` keyword
 .
     - `files` : A list (or an equivalent `iterable`) of `string` which are names of the files to parse.
     - `ouputDir` (optional) : relative path where place extracted files as a `string`. Default is current directory.
-    - `text` (optional) : indicate if files to parse will be extracted as a text file. Used as a boolean. Default is `True`.
-    - `xml` (optional) : indicate if files to parse will be extracted as a xml file. Used as boolean. Default is `False`.
+    - `text` (optional) : indicates if files to parse will be extracted as a text file. Used as a boolean. Default is `True`.
+    - `xml` (optional) : indicates if files to parse will be extracted as a xml file. Used as boolean. Default is `False`.
 
 *Note that if both `text` and `xml` are passed as `False`, files will be parsed but no output file will be writed.* 
 
-- **`parseArgs`** *(`args`)* : allow you to use the module in a script with all the options of the command line.
+- **`parseArgs`** *(`args`)* : allows you to use the module in a script with all the options of the command line.
     - `args` : a list (or an equivalent `iterable`) of `string` which are arguments, to know more about arguments and avaiblables options check the **Command line usage** section above.
 
 ## Examples
@@ -222,14 +222,14 @@ Here is a tree view of our files for this example:
 └── out
 ```
 
-Here our objective is to parse all the pdf files as xml and txt and place them in the `out` directory, there are multiple ways to do it but this time we will not use wildcards and just play with the command lines option.
+Here our objective is to parse all pdf files as xml and txt and place them in the `out` directory, there are several ways to do it, but this time we will not use wildcards and just play with the command lines option.
 
 Let's start from the simple command:
 ```sh
 python3 -m irisaparser ./a.pdf
 ```
 
-First we will use `-d` option to pass the directories with pdf files, this will work fine with `dir1` but `-d` is not recursive. So we can't just use `-d dir2`, we need to use `-d` two more times on `dir2.1` and `dir2.2`.
+First we use the `-d` option to pass the directories with pdf files, this will work fine with `dir1` but `-d` is not recursive. So we cannot just use `-d dir2`, we need to use `-d` two more times on `dir2.1` and `dir2.2`.
 
 The command with `-d` options:
 ```sh
@@ -246,7 +246,7 @@ We also want to place our output files in the directory `out` so let's use the o
 python3 -m irisaparser ./a.pdf -d ./dir1 -d ./dir2/dir2.1 -d ./dir2/dir2.2 -s -o ./out
 ```
 
-Finally as we want both xml and txt, we need to add both option in the command arguments `-t` and `-x`, remember by default txt format is used, passing `-x` allow to use xml format but to have both, both options need to be passed.
+Finally as we want both xml and txt, we need to add both options in the command arguments `-t` and `-x`, remember by default txt format is used, passing `-x` allow to use xml format but to have both, both options need to be passed.
 
 So here is the final command :
 ```sh
@@ -269,7 +269,7 @@ So in our case the program will display this list of files:
 [7] 22a.pdf
 ```
 
-These are all the files we specified to the program using the command arguments, it's the **specified list**. Now The program will ask us to choose between `exclude` and `include` mode, the `exclude` mode select by default all files and allow us to remove some files from the **selected list**, the list fo tiles to actually parse. The `include` mode do the opposit, selecting no files by default and allowing you to add files from the **specified list** to the **selected list**.
+These are all the files we specified to the program using the command arguments, it's the **specified list**. Now The program will ask us to choose between `exclude` and `include` mode, the `exclude` mode selects by default all files and allows us to remove some files from the **selected list**, the list of tiles to actually parse. The `include` mode does the opposite, selecting no files by default and allowing you to add files from the **specified list** to the **selected list**.
 
 So in this case we will use the `exclude` mode as we just want to remove 22e.txt, so just type `e` or `exclude` and then the index of the txt file: `6` :
 
