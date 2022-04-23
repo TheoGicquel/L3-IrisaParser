@@ -9,12 +9,12 @@ if __name__ == "__main__":
 # after ACKNOWLEDGEMENT 'ACKNOWLEDGEMENTS' 'REFERENCES' 'APPENDIX *' 'Follow-Up'
 
 # enable to print debug info to stdout
-debug = False
+debug = True
 def dprint(input):
     if(debug):
         print(input)
 
-
+NOT_FOUND_MSG = "NOT FOUND"
 
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
@@ -33,6 +33,9 @@ def getConclusion(parsed):
             if(posConc > -1):
                 dprint("found :'"+l+"' at pos:" + str(index) )
                 resBegin.append(index+1) # we assume next paragraph is conclusion body
+    
+    if(len(resBegin)==0):
+        return NOT_FOUND_MSG
     
     BeginArea = resBegin[-1] # use farthest match in document
     for k in endKeywords:
@@ -72,7 +75,7 @@ def getDiscussion(parsed):
         discusArea = posDisc[-1] # use farthest match in document
         return lines[discusArea]
     else:
-        return None
+        return NOT_FOUND_MSG
 
 
 # ---------- TEST ONLY (remove before production )---------- #
