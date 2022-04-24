@@ -1,13 +1,3 @@
-from tika import parser as tp
-# ---------- TEST ONLY (remove before production )---------- #
-if __name__ == "__main__":
-    filepath = "./tests/corpus_large/Torres.pdf"
-    parsed = tp.from_file(filepath)
-# ---------------------------------------------------------- #
-    
-
-
-
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
     beginKeywords = ['CONCLUSION','RESULT']
@@ -61,12 +51,3 @@ def getDiscussion(parsed):
         return lines[discusArea]
     else:
         return None
-
-
-# ---------- TEST ONLY (remove before production )---------- #
-if __name__ == "__main__":
-    concl = getConclusion(parsed)
-    #print(concl)
-    discussion = getDiscussion(parsed)
-    print(discussion)
-# ---------------------------------------------------------- #
