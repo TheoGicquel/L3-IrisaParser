@@ -6,7 +6,7 @@ if __name__ == "__main__":
 # ---------------------------------------------------------- #
     
 
-NOT_FOUND_MSG = "NOT FOUND"
+
 
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
@@ -26,7 +26,7 @@ def getConclusion(parsed):
                 resBegin.append(index+1) # we assume next paragraph is conclusion body
     
     if(len(resBegin)==0):
-        return NOT_FOUND_MSG
+        return None
     
     BeginArea = resBegin[-1] # use farthest match in document
     for k in endKeywords:
@@ -60,7 +60,7 @@ def getDiscussion(parsed):
         discusArea = posDisc[-1] # use farthest match in document
         return lines[discusArea]
     else:
-        return NOT_FOUND_MSG
+        return None
 
 
 # ---------- TEST ONLY (remove before production )---------- #
