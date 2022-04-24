@@ -24,7 +24,7 @@ Make sure that Python and Pip are installed on your computer.
 
 *This step is necessary only if you don't want to build the package yourself, if you don't want to install manually these dependencies, jump to the **Build** section.*
 
-Once all software requirements are satisfied, please make to sure to install the following pip packages :
+Once all software requirements are satisfied, please install the following pip packages :
 To install pipy packages make sure that pip is intalled and use :
 
 ```sh
@@ -60,21 +60,21 @@ python3 -m irisaparser <args>
 For example to parse a file named `f1.pdf` located in `/home/user/pdfs/` and to output results in `/tmp`, use:
 
 ```sh
-python3  -m irisaparser /home/user/pdfs/f1.pdf -o /tmp
+python3 -m irisaparser /home/user/pdfs/f1.pdf -o /tmp
 ```
 
 To parse all the files located in `/home/user/pdfs`, use:
 
 ```sh
-python3  -m irisaparser -d /home/user/pdfs
+python3 -m irisaparser -d /home/user/pdfs
 ```
 
 Note that if no output directory is provided using `-o`, text files will be placed **in current directory**.
 
-For more information about how to use `cli.py` type the following command:
+For more information about how to use module type the following command:
 
 ```sh
-python3  -m irisaparser --help
+python3 -m irisaparser --help
 ```
 
 ## Build
@@ -126,3 +126,7 @@ args = ["-d","./Corpus_2021","-o","./out"]
 irisaparser.parseArgs(args)
 
 ```
+
+## Documentation
+
+For more information about the different options and behaviors of the program consult our [documentation](https://gitlab.com/inf1603/irisaparser/-/blob/master/DOC.md) page (The `DOC.md` if you downloaded the source code).
