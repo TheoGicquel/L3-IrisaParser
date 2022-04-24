@@ -12,11 +12,9 @@ def body_extractor(parsed,intro):
     lengthintro = len(intro)-30
     intro = intro[lengthintro:]
 
-    print(intro)
 
     endIntroFinder = text.find(intro)
 
-    print(endIntroFinder)
 
     text = text[endIntroFinder:]
     #print(text)
@@ -30,7 +28,6 @@ def body_extractor(parsed,intro):
         if conclusionFinder == -1:
             conclusionFinder = text.upper().find('DISCUSSION\n')
 
-    print(conclusionFinder)
     #cut the conclusion from the text
     text = text[:conclusionFinder]
 
@@ -56,13 +53,3 @@ def body_extractor(parsed,intro):
 
 
     return bodystr
-
-    
-                
-
-    
-
-fichier.write(body_extractor(parsed).encode())
-
-fichier.close()
-

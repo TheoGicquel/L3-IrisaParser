@@ -7,6 +7,9 @@ from .title_lib import *
 from .authors_lib import *
 from .abstract_lib import *
 from .references_lib import *
+from .intro_lib import *
+from .body_lib import *
+from .conclusion_discussion_lib import *
 import pdfplumber
 from tika import parser as tikaParser
 import xml.dom.minidom
@@ -279,6 +282,20 @@ def extractAbstract(tikaInput):
     extracted_abstract = abstract_extractor(tikaInput)
     return (extracted_abstract if extracted_abstract != "error" else "not found")
 
+def extractIntroduction(tikaInput):
+    return intro_extractor(tikaInput)
+
+def extractBody(tikaInput,intro):
+    return body_extractor(tikaInput,intro)
+
+def extractConclusion(tikaInput):
+    extracted_conclusion = getConclusion(tikaInput)
+    return (extracted_conclusion if extracted_conclusion != None else "not found")
+
+def extractDiscussion(tikaInput):
+    extracted_conclusion = getDiscussion(tikaInput)
+    return (extracted_conclusion if extracted_conclusion != None else "not found")
+
 def extractReferences(tikaInput):
     return reference_extractor(tikaInput)
 
@@ -292,6 +309,10 @@ def parse_file(filename):
     ret["title"] = extractTitle(pdf_parsed_by_plumber)
     ret["authors"] = extractAuthors(pdf_parsed_by_plumber)
     ret["abstract"] = extractAbstract(pdf_parsed_by_tika)
+    ret["intro"] = extractIntroduction(pdf_parsed_by_tika)
+    ret["body"] = extractBody(pdf_parsed_by_tika,ret["intro"])
+    ret["conclusion"] = extractConclusion(pdf_parsed_by_tika)
+    ret["discussion"] = extractDiscussion(pdf_parsed_by_tika)
     ret["references"] = extractReferences(pdf_parsed_by_tika)
     return ret
 
@@ -320,6 +341,10 @@ def create_text_output(extracted_text,outPutPath):
     output_text += "titre: "+extracted_text["title"]+"\n\n"
     output_text += authorsStr+"\n\n"
     output_text += "abstract: \n"+extracted_text["abstract"]+"\n\n"
+    output_text += "introduction: \n"+extracted_text["intro"]+"\n\n"
+    output_text += "corps: \n"+extracted_text["body"]+"\n\n"
+    output_text += "conlusion: \n"+extracted_text["conclusion"]+"\n\n"
+    output_text += "discussion: \n"+extracted_text["discussion"]+"\n\n"
     output_text += "references\n"
 
     for ref in extracted_text["references"]:
@@ -376,6 +401,10 @@ def create_xml_output(extracted_text,outPutPath):
 
     output_text += get_xml_node("auteurs",authors_text)
     output_text += get_xml_node("abstract",extracted_text["abstract"],True)
+    output_text += get_xml_node("introduction",extracted_text["intro"],True)
+    output_text += get_xml_node("corps",extracted_text["body"],True)
+    output_text += get_xml_node("conclusion",extracted_text["conclusion"],True)
+    output_text += get_xml_node("discussion",extracted_text["discussion"],True)
 
     refs_text = ""
 
