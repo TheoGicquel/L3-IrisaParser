@@ -1,13 +1,5 @@
 import re
 
-pdf = []
-
-parsed = parser.from_file("./PDF/On_the_Morality_of_Artificial_Intelligence.pdf")
-
-fichier = open("./TXTTest/On_the_Morality_of_Artificial_Intelligence.txt", "wb")
-
-listPdf = [x for x in os.listdir("./") if x.endswith(".pdf")]
-
 def intro_extractor(parsed):
 
     
