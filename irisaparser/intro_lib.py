@@ -11,15 +11,24 @@ def intro_extractor(parsed):
 
     data = parsed['content'] 
 
+    intro = "1 I n t r o d u c t i o n" #jing
+    intro2 = "1 Introduction" #iria
 
-    intro = re.search(r"\n(1|I).+(Introduction|INTRODUCTION)\n", data, re.I).group()
+    if intro2 in data:
+        tmp = intro2
+        intro2 = intro
+        intro = tmp
+    elif not intro in  data:
+        intro = re.search(r"\n(1|I).+(Introduction|INTRODUCTION)\n", data, re.I).group()
 
 
-    end = re.search(r"\n(2|II).+[a-zA-Z]+(\s[a-zA-Z]+).\n", data, re.I).group()
+    end = re.search(r"\n(2|II).[^0]+([a-zA-Z]+(\s[a-zA-Z]+).).\n", data, re.I).group()
 
+        
     integer = data.find(intro)
 
     content = data[integer+len(intro):data.find(end)]
+
 
     split = content.split('\n\n')
 
@@ -27,7 +36,7 @@ def intro_extractor(parsed):
 
 
     for x in split:
-        if x.startswith('http') or x.startswith('\t') or x.startswith('\n\t') or x.startswith('∗'):
+        if x.startswith('http') or x.startswith('\t') or x.startswith('\n\t') or x.startswith('∗')  or x.endswith('.org'):
                 x = " "
         if len(x) > 50:
             if x[0].islower(): 
@@ -37,6 +46,8 @@ def intro_extractor(parsed):
 
  
     return finalstr[2:]
+
+
 
 
 
