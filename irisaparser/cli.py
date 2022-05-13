@@ -393,11 +393,15 @@ def create_xml_output(extracted_text,outPutPath):
     for author in extracted_text["authors"]:
         mail_list = extracted_text["authors"][author]
         mail_text = ""
-        for mail in mail_list:
-            mail_text += get_xml_node("mail",mail,True)
-        mail_text = get_xml_node("mails",mail_text)
+        if len(mail_list) > 0:
+            if mail_list[0].strip() == "":
+                mail_text = get_xml_node("mail","not found",True)
+            else:
+                mail_text = get_xml_node("mail",mail_list[0],True)
+        else:
+            mail_text = get_xml_node("mail","not found",True)
         name_text = get_xml_node("name",author,True)
-        affiliation_text = get_xml_node("affiliation","NOT FOUND",True)
+        affiliation_text = get_xml_node("affiliation","not found",True)
         authors_text += get_xml_node("auteur",name_text+mail_text+affiliation_text)
 
     output_text += get_xml_node("auteurs",authors_text)
