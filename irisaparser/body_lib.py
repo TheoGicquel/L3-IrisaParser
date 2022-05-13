@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from tika import parser
 import os
 import re

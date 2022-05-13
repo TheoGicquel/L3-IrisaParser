@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 def reference_extractor(parsed):
     texte = parsed["content"]
     texte = texte[1000:]

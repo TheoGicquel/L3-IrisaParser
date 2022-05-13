@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .cli import *
 
 def parseFile(filename,outputDir='./',text=True,xml=False):

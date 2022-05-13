@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import spacy
 import glob
 import json

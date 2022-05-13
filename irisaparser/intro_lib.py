@@ -1,6 +1,3 @@
-from tika import parser  
-
-import os
 import re
 
 pdf = []
