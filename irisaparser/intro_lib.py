@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-# -*- coding: utf-8 -*-
-
-# from tika import parser  
-# import os
-=======
-from tika import parser  
-
-import os
->>>>>>> 42ee6dd3e346aa5ab9469877c21d1d0a4dacc238
 import re
 
 pdf = []
