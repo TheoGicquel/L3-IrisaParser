@@ -352,7 +352,7 @@ def create_text_output(extracted_text,outPutPath):
 
     #output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
 
-    outFileName = extracted_text["fileName"]+"_extracted.txt"
+    outFileName = extracted_text["fileName"] +".txt"#+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
@@ -397,21 +397,22 @@ def create_xml_output(extracted_text,outPutPath):
             mail_text += get_xml_node("mail",mail,True)
         mail_text = get_xml_node("mails",mail_text)
         name_text = get_xml_node("name",author,True)
-        authors_text += get_xml_node("auteur",name_text+mail_text)
+        affiliation_text = get_xml_node("affiliation","NOT FOUND",True)
+        authors_text += get_xml_node("auteur",name_text+mail_text+affiliation_text)
 
     output_text += get_xml_node("auteurs",authors_text)
     output_text += get_xml_node("abstract",extracted_text["abstract"],True)
     output_text += get_xml_node("introduction",extracted_text["intro"],True)
-    output_text += get_xml_node("corps",extracted_text["body"],True)
-    output_text += get_xml_node("conclusion",extracted_text["conclusion"],True)
+    output_text += get_xml_node("body",extracted_text["body"],True)
     output_text += get_xml_node("discussion",extracted_text["discussion"],True)
+    output_text += get_xml_node("conclusion",extracted_text["conclusion"],True)
 
     refs_text = ""
 
     for ref in extracted_text["references"]:
-        refs_text+= get_xml_node("reference",ref,True)
+        refs_text+= "\n"+ref #get_xml_node("reference",ref,True)
 
-    output_text += get_xml_node("biblio",refs_text)
+    output_text += get_xml_node("biblio",refs_text,True)
 
     output_text = get_xml_node("article",output_text)
     output_text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+output_text
@@ -423,7 +424,7 @@ def create_xml_output(extracted_text,outPutPath):
         print(traceback.format_exc())
         #print(output_text)
 
-    outFileName = extracted_text["fileName"]+"_extracted.xml"
+    outFileName = extracted_text["fileName"] +".xml" #+"_extracted.xml"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
