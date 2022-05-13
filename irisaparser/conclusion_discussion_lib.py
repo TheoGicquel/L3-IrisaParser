@@ -28,6 +28,13 @@ def getConclusion(parsed):
             posNextParagraph = l[0:15].upper().find(k)
             if(posNextParagraph > -1):
                 resEnd.append(index) # we assume next paragraph is conclusion body
+    
+
+    # no paragraph found
+    if(len(resEnd) == 0):
+        return None
+
+    
     EndArea = resEnd[-1]
     
     endArray = lines[BeginArea:EndArea]
