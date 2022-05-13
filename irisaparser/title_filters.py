@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 def get_first_lines(line_list,number_of_lines):
     """return the 5 first lines, ignore lines shorter than 2 characters"""

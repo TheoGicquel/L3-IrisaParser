@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import spacy
 import re
 import pathlib
 import pdfplumber
-nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
-
+#nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
+nlp = spacy.load("en_core_web_md");
 def getMails(text):
     
     # Find all mails within the page

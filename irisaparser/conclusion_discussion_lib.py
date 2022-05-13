@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
     beginKeywords = ['CONCLUSION','RESULT']
