@@ -403,7 +403,7 @@ def create_xml_output(extracted_text,outPutPath):
     output_text += get_xml_node("auteurs",authors_text)
     output_text += get_xml_node("abstract",extracted_text["abstract"],True)
     output_text += get_xml_node("introduction",extracted_text["intro"],True)
-    output_text += get_xml_node("corps",extracted_text["body"],True)
+    output_text += get_xml_node("body",extracted_text["body"],True)
     output_text += get_xml_node("discussion",extracted_text["discussion"],True)
     output_text += get_xml_node("conclusion",extracted_text["conclusion"],True)
 
