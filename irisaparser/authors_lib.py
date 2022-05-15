@@ -4,8 +4,90 @@ import spacy
 import re
 import pathlib
 import pdfplumber
-#nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
-nlp = spacy.load("en_core_web_md");
+import string
+nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
+#nlp = spacy.load("en_core_web_md");
+
+def getAffiliations(pdfData,authors,pdfPath):
+    pdfData = pdfplumber.open(pdfPath)
+    currentPageText2 = pdfData.pages[0].extract_text(x_tolerance=1.8,y_tolerance=2)
+    
+    affiliations = {}
+    
+    # Remove unecessary chars in text extracted
+    currentPageText2 = re.sub("a´","a",currentPageText2)
+    currentPageText2 = re.sub("&\n","and ",currentPageText2)
+    currentPageText2 = re.sub("´e","é",currentPageText2)
+    currentPageText2 = re.sub("e´","é",currentPageText2)
+    currentPageText2 = re.sub("c¸","ç",currentPageText2)
+    currentPageText2 = re.sub("ˆı","î",currentPageText2)
+    currentPageText2 = re.sub("e`","è",currentPageText2)
+    currentPageText2 = re.sub("E´","É",currentPageText2)
+    currentPageText2 = re.sub("´","",currentPageText2)
+
+    regexToFindAffiliations = "(?:Univ|LIMSI|CERI|DTIC|Universitat|LIA|Labs|Laboratoire|Ecole|École|Université|University|Département|Department|Institute|DA-IICT|Google|Research|Universidade).*?(?:Canada|Brasil|France|USA|UK|CA|Italy|Aix-Marseille|Mila|India|Austin|Spain|Mexico|Edinburg)"
+    indexStartAuthor = -1
+    indexEndAuthor = -1
+    
+    c= currentPageText2.replace("\n"," ")
+    c= re.sub(" +"," ",c)
+    for auteur in authors[:]:
+        indexStartAuthor = currentPageText2.find(auteur)
+        indexEndAuthor = indexStartAuthor+len(auteur)
+        afterAuthorsStr = currentPageText2[indexEndAuthor:indexEndAuthor+1]
+        
+        # Method 1
+        if afterAuthorsStr not in string.printable:     
+
+            k=re.findall(afterAuthorsStr+" *"+regexToFindAffiliations,c)
+            if len(k)!=0: 
+                for indexAffiliation in range(len(k)):
+                    k[indexAffiliation] = re.sub(afterAuthorsStr+" *","",k[indexAffiliation])
+                affiliations[auteur] = k
+            authors.remove(auteur)
+            continue
+       
+        # Method 2
+        pp = currentPageText2[indexEndAuthor:indexEndAuthor+20]
+        v=re.search("[0-9](?:,[0-9])*",pp)
+        if v:
+            ol = v.group(0).split(",")
+            for numberAffi in ol:
+                k=re.findall(numberAffi+" *"+regexToFindAffiliations,c)
+                if not k:
+                    break
+                if auteur in affiliations.keys():
+                    affiliations[auteur].append(re.sub(numberAffi+" *","",k[0]))
+                else:
+                    affiliations[auteur] = [re.sub(numberAffi+" *","",k[0])]
+            authors.remove(auteur)    
+            continue
+    
+    # Method 3
+    k=re.findall(regexToFindAffiliations,c)
+    
+    if len(k)==1:
+        for auteur in authors:
+            affiliations[auteur] = [k[0]]
+    elif len(k)!=0 and len(k)<=len(authors):
+        for affiIndex in range(len(k)):
+            affiliations[authors[affiIndex]] = [k[affiIndex]]
+    elif len(k)!=0 and len(authors)<len(k):
+        for authorIndex in range(len(authors)):
+            affiliations[authors[authorIndex]] =[ k[authorIndex]]
+    else:
+        for auteur in authors:
+            affiliations[auteur]=[]
+        
+                     
+    return affiliations
+
+
+
+
+
+
+
 def getMails(text):
     
     # Find all mails within the page
@@ -73,9 +155,8 @@ def getAuthors(pdfData,pageNumber=0):
     currentPageText = re.sub("e´","é",currentPageText)
     currentPageText = re.sub("c¸","ç",currentPageText)
     currentPageText = re.sub("ˆı","î",currentPageText)
+    currentPageText = re.sub("e`","è",currentPageText)
     
-    
-  
         
     doc = nlp(currentPageText)
     namesFound = []
@@ -95,7 +176,8 @@ def getAuthors(pdfData,pageNumber=0):
     return namesFound
 
 
-def getAuthorsInfos(pdfData,pageNumber=0):
+
+def associateMailsWithAuthors(pdfData,auteurs,pageNumber=0):
     
     # Dictionnary that will contain name and list of mails corresponding
     authorsInfos={}
@@ -104,10 +186,6 @@ def getAuthorsInfos(pdfData,pageNumber=0):
     
     # Get all mails
     mailsFound = getMails(currentPageText)
-    
-    # Get all authors
-    auteurs = getAuthors(pdfData)
-    
     nothingFound = True
     for auteur in auteurs:
         authorsInfos[auteur]=["",]
@@ -128,6 +206,19 @@ def getAuthorsInfos(pdfData,pageNumber=0):
     return authorsInfos
 
 
-# Example of use
-if __name__ == "__main__":
-    print(getAuthorsInfos("339946AC27C12253960F8BF99F2C033EC01CB585/jne11_4_046009.pdf"))
+
+def getInformationsAuthors(pdfData,pdfPath):
+    
+    finalInfos = {}
+    
+    auteurs = getAuthors(pdfData)
+    mails = associateMailsWithAuthors(pdfData,auteurs)
+    affiliations = getAffiliations(pdfData,auteurs,pdfPath)
+    
+    # TODO : do better
+    for author,mail in mails.items():
+        finalInfos[author] = {"mail":mail}
+    for author,affiliation in affiliations.items():
+        finalInfos[author]["affiliation"] = affiliation
+    
+    return finalInfos
