@@ -277,8 +277,8 @@ def check_args_and_retrive_filenames(args):
 def extractTitle(pdf:pdfplumber.PDF):
     return get_title(pdf)
 
-def extractAuthors(pdf:pdfplumber.PDF):
-    return getAuthorsInfos(pdf)
+def extractAuthors(pdf:pdfplumber.PDF,filepath:string):
+    return getInformationsAuthors(pdf,filepath)
 
 def extractAbstract(tikaInput):
     extracted_abstract = abstract_extractor(tikaInput)
@@ -309,7 +309,7 @@ def parse_file(filename):
     ret = {}
     ret["fileName"] = os.path.basename(filename)
     ret["title"] = extractTitle(pdf_parsed_by_plumber)
-    ret["authors"] = extractAuthors(pdf_parsed_by_plumber)
+    ret["authors"] = extractAuthors(pdf_parsed_by_plumber,filename)
     ret["abstract"] = extractAbstract(pdf_parsed_by_tika)
     ret["intro"] = extractIntroduction(pdf_parsed_by_tika)
     ret["body"] = extractBody(pdf_parsed_by_tika,ret["intro"])
@@ -327,14 +327,25 @@ def create_text_output(extracted_text,outPutPath):
 
     authorsStr = "auteurs: "
     
-    for key in extracted_text["authors"]:
-        mailList = extracted_text["authors"][key]
-        authorsStr+="\n"+key+" ("
-        if mailList != None:
+    for author in extracted_text["authors"]:
+
+        mailList = extracted_text["authors"][author]["mail"]
+        authorsStr+="\n"+author+" ("
+        if mailList != None and len(mailList) > 0 and mailList[0].strip() != "":
             authorsStr+= ", ".join(mailList)
         else:
             authorsStr="mail not found"
         authorsStr+=")"
+        
+        affiliationList = extracted_text["authors"][author]["mail"]
+        authorsStr+="\n"+" from: ["
+        if affiliationList != None and len(affiliationList) > 0 and affiliationList[0].strip() != "":
+            authorsStr+= ", ".join(affiliationList)
+        else:
+            authorsStr="affiliation not found"
+        authorsStr+="]"
+
+
 
     if not extracted_text["authors"]:
         authorsStr+=" not found"
