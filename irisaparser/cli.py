@@ -365,7 +365,8 @@ def create_text_output(extracted_text,outPutPath):
 
     #output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
 
-    outFileName = extracted_text["fileName"] +".txt"#+"_extracted.txt"
+    outFileName = os.path.splitext(os.path.basename(extracted_text["fileName"]))[0]+".txt"
+    # outFileName = extracted_text["fileName"] +".txt"#+"_extracted.txt"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
@@ -407,19 +408,23 @@ def create_xml_output(extracted_text,outPutPath):
 
         name_text = get_xml_node("name",author,True)
 
-        mail_list = extracted_text["authors"][author]["mail"]
+        
         mail_text = get_xml_node("mail","not found",True)
 
-        if len(mail_list) > 0:
-            if mail_list[0].strip() != "":
-                mail_text = get_xml_node("mail",mail_list[0],True)
+        if extracted_text["authors"][author].get("mail") != None:
+            mail_list = extracted_text["authors"][author]["mail"]
+            if len(mail_list) > 0:
+                if mail_list[0].strip() != "":
+                    mail_text = get_xml_node("mail",mail_list[0],True)
 
-        affiliation_list = extracted_text["authors"][author]["affiliation"]
+        
         affiliation_text = get_xml_node("affiliation","not found",True)
-
-        if len(affiliation_list) > 0:
-            if affiliation_list[0].strip() != "":
-                affiliation_text = get_xml_node("affiliation",affiliation_list[0],True)
+            
+        if extracted_text["authors"][author].get("affiliation") != None:
+            affiliation_list = extracted_text["authors"][author]["affiliation"]
+            if len(affiliation_list) > 0:
+                if affiliation_list[0].strip() != "":
+                    affiliation_text = get_xml_node("affiliation",affiliation_list[0],True)
 
         authors_text += get_xml_node("auteur",name_text+mail_text+affiliation_text)
 
@@ -447,7 +452,8 @@ def create_xml_output(extracted_text,outPutPath):
         print(traceback.format_exc())
         #print(output_text)
 
-    outFileName = extracted_text["fileName"] +".xml" #+"_extracted.xml"
+    outFileName = os.path.splitext(os.path.basename(extracted_text["fileName"]))[0]+".xml"
+    # outFileName = extracted_text["fileName"] +".xml" #+"_extracted.xml"
     outFile = open((os.path.join(outPutPath,outFileName)),"w", encoding="utf-8")
     outFile.write(output_text)
     outFile.close()
@@ -467,14 +473,22 @@ def execute(args):
 
             for file in files:
                 try:
+                    print("Parsing: "+file)
                     extracted_text = parse_file(file)
-                    if ret["text"]: create_text_output(extracted_text,outputDir)
-                    if ret["xml"]: create_xml_output(extracted_text,outputDir)
+                    if ret["text"]:
+                        print("Generating text output in "+outputDir+"\n")
+                        create_text_output(extracted_text,outputDir)
+                    if ret["xml"]:
+                        print("Generating xml output in "+outputDir)
+                        create_xml_output(extracted_text,outputDir)
+                    print(file+" finished !\n")
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
                     print("file: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
                     print(" unexpected unicode error: ",end="")
                     print(traceback.format_exc())
+                except BaseException as ex:
+                    print(" unexpected error occured !")
 
     except ArgumentException as ex:
         print("error: "+str(ex))

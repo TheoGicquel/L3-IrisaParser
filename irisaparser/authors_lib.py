@@ -199,10 +199,6 @@ def associateMailsWithAuthors(pdfData,auteurs,pageNumber=0):
                         authorsInfos[auteur]=[mail,]
                     mailsFound.remove(mail)
 
-    if pageNumber==0 and nothingFound:
-        return getAuthorsInfos(pdfData,1)
-    elif pageNumber==1 and nothingFound:
-        return getAuthorsInfos(pdfData,len(pdfData.pages)-1)
     return authorsInfos
 
 
