@@ -337,7 +337,7 @@ def create_text_output(extracted_text,outPutPath):
             authorsStr="mail not found"
         authorsStr+=")"
         
-        affiliationList = extracted_text["authors"][author]["mail"]
+        affiliationList = extracted_text["authors"][author]["affiliation"]
         authorsStr+="\n"+" from: ["
         if affiliationList != None and len(affiliationList) > 0 and affiliationList[0].strip() != "":
             authorsStr+= ", ".join(affiliationList)
@@ -414,7 +414,7 @@ def create_xml_output(extracted_text,outPutPath):
             if mail_list[0].strip() != "":
                 mail_text = get_xml_node("mail",mail_list[0],True)
 
-        affiliation_list = extracted_text["authors"][author]["mail"]
+        affiliation_list = extracted_text["authors"][author]["affiliation"]
         affiliation_text = get_xml_node("affiliation","not found",True)
 
         if len(affiliation_list) > 0:
