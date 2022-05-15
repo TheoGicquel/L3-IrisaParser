@@ -2,7 +2,7 @@
 
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
-    beginKeywords = ['CONCLUSION','RESULT']
+    beginKeywords = ['CONCLUSION','CONCLUSIONS']
     content = parsed["content"]
     resBegin = []
     resEnd = []
@@ -43,7 +43,9 @@ def getConclusion(parsed):
     final = ''
     for l in endArray:
         final = f'{final}{l}'
-    return final
+    if(len(final)>0):
+            return final
+    return None
     
 def getDiscussion(parsed):
     content = parsed["content"]
