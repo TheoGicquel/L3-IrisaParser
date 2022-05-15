@@ -2,7 +2,7 @@
 
 def getConclusion(parsed):
     endKeywords = ['ACKNOWLEDGMENT','ACKNOWLEDGEMENTS','REFERENCES','APPENDIX','FOLLOW-UP']
-    beginKeywords = ['CONCLUSION']
+    beginKeywords = ['CONCLUSION','CONCLUSIONS']
     content = parsed["content"]
     resBegin = []
     resEnd = []
