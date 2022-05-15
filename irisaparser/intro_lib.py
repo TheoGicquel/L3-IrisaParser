@@ -10,9 +10,17 @@ def intro_extractor(parsed):
     intro2 = "1 Introduction" #iria
     intro3 = "1. Introduction" #survey 
     intro4 = "1 Artificial Intelligence Leaves the Research Lab"
+    intro5 = "Introduction"
 
 
-    if intro2 in data:
+    
+
+    if intro5 in data:
+        tmp = intro5
+        intro5 = intro
+        intro = tmp 
+
+    elif intro2 in data:
         tmp = intro2
         intro2 = intro
         intro = tmp
@@ -20,7 +28,8 @@ def intro_extractor(parsed):
     elif intro3 in data:
         tmp = intro3
         intro3 = intro
-        intro = tmp    
+        intro = tmp   
+
     elif intro4 in data:
         data = " "
         return data
@@ -31,6 +40,13 @@ def intro_extractor(parsed):
     
 
     end = "2. Description of some terminology extraction systems " #survey
+    end2 = "2. Related Work"
+
+
+    if end2 in data:
+        tmp = end2
+        end2 = end
+        end = tmp
 
     if not end in data:
         end = re.search(r"\n(2|II).[^0]+([a-zA-Z]+(\s[a-zA-Z]+).).\n", data, re.I).group()
