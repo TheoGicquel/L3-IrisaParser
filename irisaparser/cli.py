@@ -467,9 +467,15 @@ def execute(args):
 
             for file in files:
                 try:
+                    print("Parsing: "+file)
                     extracted_text = parse_file(file)
-                    if ret["text"]: create_text_output(extracted_text,outputDir)
-                    if ret["xml"]: create_xml_output(extracted_text,outputDir)
+                    if ret["text"]:
+                        print("Generating text output in "+outputDir)
+                        create_text_output(extracted_text,outputDir)
+                    if ret["xml"]:
+                        print("Generating xml output in "+outputDir)
+                        create_xml_output(extracted_text,outputDir)
+                    print(file+" finished !")
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
                     print("file: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
