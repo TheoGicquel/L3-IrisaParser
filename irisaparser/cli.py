@@ -473,7 +473,7 @@ def execute(args):
 
             for file in files:
                 try:
-                    print("\u001b[33mParsing: "+file)
+                    print("\u001b[33m\u001b[5mParsing: "+file)
                     extracted_text = parse_file(file)
                     if ret["text"]:
                         print("\u001b[1A\u001b[KGenerating text output in "+outputDir)
@@ -481,14 +481,14 @@ def execute(args):
                     if ret["xml"]:
                         print("\u001b[1A\u001b[KGenerating xml output in "+outputDir)
                         create_xml_output(extracted_text,outputDir)
-                    print("\u001b[1A\u001b[K\u001b[32m"+file+" finished !\n")
+                    print("\u001b[1A\u001b[K\u001b[0m\u001b[32m"+file+" finished !\n")
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
-                    print("file: "+file+" is probably not a pdf, ignored")
+                    print("\u001b[0m\u001b[31mfile: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
-                    print(" unexpected unicode error: ",end="")
+                    print("\u001b[0m\u001b[31munexpected unicode error: ",end="")
                     print(traceback.format_exc())
                 except BaseException as ex:
-                    print(" unexpected error occured !")
+                    print("\u001b[0m\u001b[31munexpected error occured: "+str(ex))
 
     except ArgumentException as ex:
         print("error: "+str(ex))
