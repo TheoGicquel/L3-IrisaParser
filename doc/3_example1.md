@@ -6,18 +6,22 @@ There is a list of Examples of typical usage of irisaparser.
 ### Example 1
 
 Here is a tree view of our files for this example:
-```
+
+```tree
 ├── fileA.pdf
 ├── fileB.pdf
 └── fileC.pdf
 ```
 
 - **To parse only one file:**
-    ```sh
+
+    ```shell
     python3 -m irisaparser fileA.pdf
     ```
+
     Here is a tree view of the directory after the execution:
-    ```
+
+    ```tree
     ├── fileA.pdf
     ├── fileA_extracted.txt
     ├── fileB.pdf
@@ -30,22 +34,27 @@ Here is a tree view of our files for this example:
 
     To create output as xml you should add the option `-x` or `--xml`.
 
-    - using `-d` :
+  - using `-d` :
+
     ```sh
     python3 -m irisaparser -d ./ -x
     ```
 
-    - passing all files one by one:
+  - passing all files one by one:
+
     ```sh
     python3 -m irisaparser fileA.pdf fileB.pdf fileC.pdf -x
     ```
 
-    - using [wildcards](https://en.wikipedia.org/wiki/Glob_(programming)):
+  - using [wildcards](https://en.wikipedia.org/wiki/Glob_(programming)):
+
     ```sh
     python3 -m irisaparser ./* -x
     ```
+
     Here is a tree view of the directory after the execution:
-    ```
+
+    ```tree
     ├── fileA.pdf
     ├── fileA_extracted.xml
     ├── fileB.pdf

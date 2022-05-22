@@ -7,7 +7,7 @@
 
     *The full documentation fo these functions is explained in the **Python script usage** section above*
 
-    For this we use the `parseFile` function exposed by the module, here is a simple script to parse a file named `somepdf.pdf` located in `/tmp` using both output type, txt and xml:
+    To do this we use the `parseFile` method exposed by the module, here is a simple script to parse a file named `somepdf.pdf` located in `/tmp` using both output type, txt and XML:
 
     ```py
     import irisaparser # import the module
@@ -18,7 +18,7 @@
 
 - **Parse multiples files using a python script**
 
-    For this you could use any iterable structures of string and pass it to the function `parseFile` but we will make a little utility to recursively parse all files ending by the `.pdf` extension from a directory gived as argument:
+    For this you could use any iterable structure of strings and pass it to the function `parseFile` however we will create a little utility to recursively parse all files ending with the `.pdf` extension from a directory given as argument:
 
     ```py
     import irisaparser # as usual
@@ -28,25 +28,26 @@
 
     files = [] # list of selected files
 
-    def select_files_from_directory(directory): # function for recursivty
+    def select_files_from_directory(directory): # function to call for recursivly
         if os.path.isdir(directory): # to be sure that a directory was passed
             for file in os.listdir(directory):
 
                 if os.isdir(file):
-                    select_files_from_directory(file) # if we ancounter ta directory we call the function another time
+                    select_files_from_directory(file) # if we encounter the directory we call the function once more
                 elif os.path.splitext(file)[1] == '.pdf':
                     files.append(file)
 
     select_files_from_directory(main_directory) # first call to the recursive function
 
-    if files.count > 0: # don't parse empty list
+    if files.count > 0: # do not parse empty list
         irisaparser.parseFiles(files) # place output txt files in current directory
     ```
-    *There is multiples ways in python to parcour recursively diretories, whe choose this one because it was simple to explain for us*
+
+    *There are multiple ways in python to go recursively through directories, whe chose this one because it was simpler to explain*
 
 - **Pass multiples options to the program using a python script**
 
-    This function allow you to use the module like a command line utility in a python script, this word just as the command line does, just pass a `list` (or any `iterable`) of arguments as `string`, here is a simple example:
+    This function allows you to use the module like a command line utility inside a python script, this works in the same way as the command line, just pass a `list` (or any `iterable`) of arguments as `string`, here is a simple example:
 
     Here we parse the file `somefile.pdf` from our current directory and place the xml output in the `/tmp` directory.
 
@@ -57,5 +58,5 @@
 
     irisaparesr.parseArgs(arguments)
     ```
-    
+
     *Note that we don't recommend the usage of the `--select` option in a python script if it's not designed to be used in a terminal, as using this option will require user input to parse files.*
