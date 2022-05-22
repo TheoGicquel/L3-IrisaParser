@@ -19,7 +19,6 @@ Jump to the **Example** section to view typical usage examples.
 ## Command line usage
 
 ### Default usage
-
 The default usage of a command is :
 
 ```shell
