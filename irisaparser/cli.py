@@ -409,7 +409,7 @@ def create_xml_output(extracted_text,outPutPath):
         name_text = get_xml_node("name",author,True)
 
         
-        mail_text = get_xml_node("mail","not found",True)
+        mail_text = get_xml_node("mail","",True)
 
         if extracted_text["authors"][author].get("mail") != None:
             mail_list = extracted_text["authors"][author]["mail"]
@@ -418,7 +418,7 @@ def create_xml_output(extracted_text,outPutPath):
                     mail_text = get_xml_node("mail",mail_list[0],True)
 
         
-        affiliation_text = get_xml_node("affiliation","not found",True)
+        affiliation_text = get_xml_node("affiliation","",True)
             
         if extracted_text["authors"][author].get("affiliation") != None:
             affiliation_list = extracted_text["authors"][author]["affiliation"]
