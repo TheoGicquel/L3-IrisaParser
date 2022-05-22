@@ -19,7 +19,13 @@ def abstract_extractor(parsed):
             if len(x) > 200:
                 return x
         return "error"
+    if intro == -1:
+        splited_text = text[abstr:].split("\n\n")
 
+        for x in splited_text:
+            return x
+        return "error"
+    
     else:
         cut = 0
         for x in range(intro, abstr, -1):
