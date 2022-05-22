@@ -4,6 +4,18 @@ This document describes all available options for the python module `irisaparser
 
 Jump to the **Example** section to view typical usage examples.
 
+- [IrisaParser Documentation](#irisaparser-documentation)
+  - [Command line usage](#command-line-usage)
+    - [Default usage](#default-usage)
+    - [About selection](#about-selection)
+    - [Quick demonstration](#quick-demonstration)
+  - [Examples](#examples)
+    - [Example 1](#example-1)
+    - [Example 2](#example-2)
+    - [Example 3](#example-3)
+
+---
+
 ## Command line usage
 
 ### Default usage
@@ -191,7 +203,7 @@ Here is a tree view of our files for this example:
 
 ### Example 2
 
-#### **Parse multiples files in multiples directories in a specified output directory**
+> **Parse multiples files in multiples directories into a specified output directory**
 
 Here is a tree view of the files for this example:
 
