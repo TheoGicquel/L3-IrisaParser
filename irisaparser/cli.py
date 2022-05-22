@@ -39,41 +39,53 @@ def get_files_from_directories(files,directories):
                         if not file in files:
                             newFiles.append(file)
                         else:
-                            print("file: "+file+" in directory: "+directory+" already provided, ignored")
+                            print("\u001b[33mfile: "+file+" in directory: "+directory+" already selected, ignored\u001b[0m")
             else:
-                print("directory: "+directory+" not a directory, ignored")
+                print("\u001b[31mdirectory: "+directory+" not a directory, ignored\u001b[0m")
         else:
-            print("directory: "+directory+" not found, ignored")
+            print("\u001b[31mdirectory: "+directory+" not found, ignored\u001b[0m")
 
-        if(len(newFiles) == 0): print("directory: "+directory+" no valid file found")
+        if(len(newFiles) == 0): print("\u001b[33mdirectory: "+directory+" no valid file found\u001b[0m")
 
     return newFiles
 
 def select_files(files):
     indexed_files = {}
     files_to_parse = {}
-
+    
+    print("\u001b[0m\nCurrent specified files:")
     for index,file in enumerate(files):
         indexed_files[index] = file
         print("["+str(index)+"] "+os.path.basename(file))
 
     def print_selected_files():
-        print("\nCurrent selected files:\n")
+        print("\u001b[0m\nCurrent selected files:")
         for index in files_to_parse:
-            print("["+str(index)+"] "+os.path.basename(files_to_parse.get(index)))
+            print("\u001b[0m["+str(index)+"]\u001b[32m "+os.path.basename(files_to_parse.get(index))+"\u001b[0m")
+        if len(files_to_parse) == 0:
+            print("\u001b[0mnone")
+
+    def print_included_files():
+        print("\u001b[0m\nCurrent specified (and \u001b[32mselected\u001b[0m) files:")
+        for index in indexed_files:
+            line_color = "\u001b[0m"
+            if files_to_parse.get(index) != None:
+                line_color = "\u001b[32m"
+            print("["+str(index)+"] "+line_color+os.path.basename(indexed_files.get(index))+"\u001b[0m")
+        pass
 
     def include_file(index):
         if contains(indexed_files,index):
             file = indexed_files.get(index)
             files_to_parse[index] = file
-            print("["+str(index)+"] "+os.path.basename(file)+" was added to the files to parse")
-        else: print("["+str(index)+"] file is not indexed and can't be included")
+            print("\u001b[0m["+str(index)+"]\u001b[32m "+os.path.basename(file)+" was added to the files to parse\u001b[0m")
+        else: print("\u001b[0m["+str(index)+"]\u001b[31m file is not indexed and can't be included\u001b[0m")
 
     def exclude_file(index):
         if contains(files_to_parse,index):
             file = files_to_parse.pop(index)
-            print("["+str(index)+"] "+os.path.basename(file)+" was removed from files to parse")
-        else: print("["+str(index)+"] file is not selected and can't be exclude")
+            print("\u001b[0m["+str(index)+"]\u001b[32m "+os.path.basename(file)+" was removed from files to parse\u001b[0m")
+        else: print("\u001b[0m["+str(index)+"]\u001b[31m file is not selected and can't be exclude\u001b[0m")
 
     print_select_help()
 
@@ -85,39 +97,45 @@ def select_files(files):
     while not choice:
         user_input = input().strip()
         match  = re.match(first_regex,user_input)
+        #print("\u001b[1A\u001b[K")
         if match:
             if match.group('exclude'):
                 mode = 'exclude'
                 files_to_parse = indexed_files.copy()
-                print("exclude mode selected, all files are selected at start")
+                print("\u001b[32mexclude mode selected, all files are selected at start\u001b[0m")
+                print_selected_files()
                 choice = True
 
             elif match.group('include'):
                 mode = 'include'
-                print("include mode selected, no files selected at start")
+                print("\u001b[32minclude mode selected, no files selected at start\u001b[0m")
+                print_selected_files()
                 choice = True
 
             elif match.group('cancel'):
                 raise QuitException()
 
         else:
-            print("please specify a mode to start with : type 'e' or 'exclude', 'i' or 'include' or quit using 'c' or 'cancel' before selecting files.\n")
+            print("\u001b[31mplease specify a mode to start with : type 'e' or 'exclude', 'i' or 'include' or quit using 'c' or 'cancel' before selecting files.\u001b[0m")
 
 
     valid = False
-    general_regex = r"^((?P<exclude>e|exclude)|(?P<include>i|include)|(?P<number>[0-9]+)|(?P<interval>[0-9]+-[0-9]+)|(?P<yes>y|yes)|(?P<cancel>c|cancel)|(?P<help>h|help))$"
+    general_regex = r"^((?P<exclude>e|exclude)|(?P<include>i|include)|(?P<number>[0-9]+)|(?P<interval>[0-9]+-[0-9]+)|(?P<yes>y|yes)|(?P<cancel>c|cancel)|(?P<help>h|help)|(?P<list>l|list))$"
 
     while not valid:
         user_input = input().strip()
         match  = re.match(general_regex,user_input)
+        #print("\u001b[1A\u001b[K")
         if match:
             if match.group('exclude'):
                 mode = 'exclude'
                 print("switched to exclude mode")
+                print_selected_files()
 
             elif match.group('include'):
                 mode = 'include'
                 print("switched to include mode")
+                print_selected_files()
 
             elif match.group('number'):
                 index = int(user_input)
@@ -133,7 +151,7 @@ def select_files(files):
                 first_index = int(boundary[0])
                 last_index = int(boundary[1])
                 if last_index < first_index:
-                    print(""+user_input+" is not valid, last index must be superior or equal to the first index")
+                    print("\u001b[0m"+user_input+"\u001b[31m is not valid, last index must be superior or equal to the first index")
                 else:
                     for step in range(((last_index-first_index)+1)):
                         if mode == 'exclude': exclude_file(first_index+step)
@@ -150,8 +168,11 @@ def select_files(files):
             elif match.group('help'):
                 print_select_help()
 
+            elif match.group('list'):
+                print_included_files()
+
         else:
-            print("unknown input: "+user_input+" type 'h' or 'help' for help, type 'c' or 'cancel' to quit.\n")
+            print("\u001b[31m unknown input: \u001b[0m"+user_input+"\u001b[31m type 'h' or 'help' for help, type 'c' or 'cancel' to quit.\u001b[0m\n")
 
     return files_to_parse.values()
 
@@ -164,6 +185,7 @@ def print_select_help():
     type <number>'-'<number> to include/exclude multiple files at once (inclusive).\n\n\
     type 'y' or 'yes' to confirm your selection and start parsing task\n\
     type 'c' or 'cancel' to cancel the parsing and quit the program\n\n\
+    type 'l' or 'list' to display file list\n\n\
     type 'h' or 'help' to show this help again\n\n")
 
 
@@ -212,9 +234,9 @@ def check_args_and_retrive_filenames(args):
         elif current_arg == "-d" or current_arg == "--directory": #directory
 
             if(index+1 >= len(args)):
-                raise ArgumentException("argument missing after "+current_arg)
+                raise ArgumentException("argument missing after "+current_arg+"\u001b[0m")
             elif(args[index+1] in availables_option):
-                raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", directory expected")
+                raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", directory expected\u001b[0m")
             else:
                 index += 1
                 directories.append(args[index])
@@ -222,19 +244,19 @@ def check_args_and_retrive_filenames(args):
         elif current_arg == "-o" or current_arg == "--output_directory": #output directory
 
             if(ret.get("output") != None):
-                raise ArgumentException("invalid duplicated option "+current_arg+", multiple output directories not allowed")
+                raise ArgumentException("\u001b[31minvalid duplicated option "+current_arg+", multiple output directories not allowed\u001b[0m")
             if(index+1 >= len(args)):
-                raise ArgumentException("argument missing after "+current_arg)
+                raise ArgumentException("\u001b[31margument missing after "+current_arg+"\u001b[0m")
             elif(args[index+1] in availables_option):
-                raise ArgumentException("invalid option "+args[index+1]+" after "+current_arg+", argument expected")
+                raise ArgumentException("\u001b[31minvalid option "+args[index+1]+" after "+current_arg+", argument expected\u001b[0m")
             else:
                 index += 1
                 outputDir = args[index]
 
                 if(not os.path.exists(outputDir)):
-                    raise ArgumentException("provided output "+outputDir+" not found")
+                    raise ArgumentException("\u001b[31mprovided output "+outputDir+" not found\u001b[0m")
                 elif(not os.path.isdir(outputDir)):
-                    raise ArgumentException("provided output "+outputDir+" is not a directory")
+                    raise ArgumentException("\u001b[31mprovided output "+outputDir+" is not a directory\u001b[0m")
                 else:
                     ret["output"] = outputDir
 
@@ -249,16 +271,16 @@ def check_args_and_retrive_filenames(args):
         elif(not current_arg in files):
             files.append(current_arg)
         else:
-            print("file: "+current_arg+" already provided, ignored")
+            print("\u001b[33mfile: "+current_arg+" already selected, ignored\u001b[0m")
         index += 1
 
     for file in files:
 
         if(not os.path.exists(file)):
-            print("file: "+file+" not found, ignored")
+            print("\u001b[31mfile: "+file+" not found, ignored\u001b[0m")
             files.remove(file)
         elif(not os.path.isfile(file)):
-            print("file: "+file+" not a file, ignored")
+            print("\u001b[31mfile: "+file+" not a file, ignored\u001b[0m")
             files.remove(file)
 
     if(len(directories) > 0):
@@ -448,7 +470,7 @@ def create_xml_output(extracted_text,outPutPath):
     try:
         output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
     except Exception as ex:
-        print(" unexpected xml error for file"+extracted_text["fileName"]+": ",end="")
+        print("\u001b[31munexpected xml error for file"+extracted_text["fileName"]+": ")
         print(traceback.format_exc())
         #print(output_text)
 
@@ -473,26 +495,26 @@ def execute(args):
 
             for file in files:
                 try:
-                    print("Parsing: "+file)
+                    print("\u001b[33m\u001b[5mParsing: "+file)
                     extracted_text = parse_file(file)
                     if ret["text"]:
-                        print("Generating text output in "+outputDir+"\n")
+                        print("\u001b[1A\u001b[KGenerating text output in "+outputDir)
                         create_text_output(extracted_text,outputDir)
                     if ret["xml"]:
-                        print("Generating xml output in "+outputDir)
+                        print("\u001b[1A\u001b[KGenerating xml output in "+outputDir)
                         create_xml_output(extracted_text,outputDir)
-                    print(file+" finished !\n")
+                    print("\u001b[1A\u001b[K\u001b[0m\u001b[32m"+file+" finished !\n")
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
-                    print("file: "+file+" is probably not a pdf, ignored")
+                    print("\u001b[0m\u001b[31mfile: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
-                    print(" unexpected unicode error: ",end="")
+                    print("\u001b[0m\u001b[31munexpected unicode error: ",end="")
                     print(traceback.format_exc())
                 except BaseException as ex:
-                    print(" unexpected error occured : "+str(ex))
+                    print("\u001b[0m\u001b[31munexpected error occured: "+str(ex))
 
     except ArgumentException as ex:
-        print("error: "+str(ex))
-        print("use -h or --help for usage"+"\n")
+        print("\u001b[31merror: "+str(ex))
+        print("\u001b[0muse -h or --help for usage"+"\n")
     
     except QuitException as ex:
-        print("exit program")
+        print("\u001b[32mexit program")
