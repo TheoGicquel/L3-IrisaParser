@@ -448,7 +448,7 @@ def create_xml_output(extracted_text,outPutPath):
     try:
         output_text = (xml.dom.minidom.parseString(output_text)).toprettyxml()
     except Exception as ex:
-        print(" unexpected xml error for file"+extracted_text["fileName"]+": ",end="")
+        print(" unexpected xml error for file"+extracted_text["fileName"]+": ",end='\r')
         print(traceback.format_exc())
         #print(output_text)
 
@@ -473,15 +473,15 @@ def execute(args):
 
             for file in files:
                 try:
-                    print("Parsing: "+file)
+                    print("\u001b[33mParsing: "+file)
                     extracted_text = parse_file(file)
                     if ret["text"]:
-                        print("Generating text output in "+outputDir+"\n")
+                        print("\u001b[1A\u001b[KGenerating text output in "+outputDir)
                         create_text_output(extracted_text,outputDir)
                     if ret["xml"]:
-                        print("Generating xml output in "+outputDir)
+                        print("\u001b[1A\u001b[KGenerating xml output in "+outputDir)
                         create_xml_output(extracted_text,outputDir)
-                    print(file+" finished !\n")
+                    print("\u001b[1A\u001b[K\u001b[32m"+file+" finished !\n")
                 except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as ex:
                     print("file: "+file+" is probably not a pdf, ignored")
                 except UnicodeEncodeError as ex:
