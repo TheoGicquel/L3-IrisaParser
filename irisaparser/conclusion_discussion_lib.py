@@ -26,7 +26,7 @@ def getConclusion(parsed):
             break
         for index,l in enumerate(lines):
             posNextParagraph = l[0:15].upper().find(k)
-            if(posNextParagraph > -1):
+            if(posNextParagraph > -1 and (len(lines[index+1])>0)):
                 resEnd.append(index) # we assume next paragraph is conclusion body
     
 
@@ -48,16 +48,21 @@ def getConclusion(parsed):
     return None
     
 def getDiscussion(parsed):
+    discKeywords = ['DISCUSSION','DISCUSSIONS','ACKNOWLEDGEMENTS','ACKNOWLEDGEMENT']
     content = parsed["content"]
     posDisc= []
     lines = content.split('\n\n') # hopefully separate paragraphs
-    
-    for index,l in enumerate(lines):
-            pos = l[0:15].upper().find('DISCUSSION')
-            if(pos > -1):              
-                posDisc.append(index+1) # we assume next paragraph is discussion body
+    for k in discKeywords:
+        if(len(posDisc)>0): # break loop at first 
+            break
+        for index,l in enumerate(lines):
+                pos = l[0:15].upper().find(k)
+                if(pos > -1 and (len(lines[index+1])>0)):
+                        posDisc.append(index+1) # we assume next paragraph is discussion body
 
-    if(len(posDisc)>0):    
+
+
+    if(len(posDisc)>0):
         discusArea = posDisc[-1] # use farthest match in document
         return lines[discusArea]
     else:
