@@ -2,6 +2,15 @@
 
 Python script to parse pdf files into text files.
 
+- [IrisaParser](#irisaparser)
+  - [Setup](#setup)
+    - [Software requirements](#software-requirements)
+    - [Pip packages](#pip-packages-optional)
+  - [Usage](#usage)
+  - [Build](#build)
+  - [package usage](#package-usage)
+  - [documentation](#documentation)
+
 ## Setup
 
 You can get the latest stable version by cloning the `master` branch of our repository with :
@@ -23,7 +32,7 @@ Make sure that Python and Pip are installed on your computer.
 
 ### Pip packages *(optional)*:
 
-*This step is necessary only if you do not want to build the package yourself, if you do not wisth to install manually these dependencies, jump to the **Build** section.*
+*This step is necessary only if you do not want to build the package yourself, if you do not wisth to install manually these dependencies, jump to the [Build](#build) section.*
 
 Once all software requirements are satisfied, please install the following pip packages :
 To install PiPy packages make sure that pip is installed and use :
