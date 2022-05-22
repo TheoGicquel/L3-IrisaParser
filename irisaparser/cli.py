@@ -488,7 +488,7 @@ def execute(args):
                     print(" unexpected unicode error: ",end="")
                     print(traceback.format_exc())
                 except BaseException as ex:
-                    print(" unexpected error occured !")
+                    print(" unexpected error occured : "+str(ex))
 
     except ArgumentException as ex:
         print("error: "+str(ex))

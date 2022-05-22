@@ -5,6 +5,7 @@ import re
 import pathlib
 import pdfplumber
 import string
+import unicodedata
 
 nlp = spacy.load(str(pathlib.Path(__file__).parent.absolute())+'/CustomNER/')
 
